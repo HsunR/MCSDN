@@ -10,7 +10,11 @@
     </select>
 
     <select id="findByName" resultType="com.blog.entity.Tag">
-        SELECT id, name, created_at FROM tags WHERE name = #{name}
+        SELECT id, name, created_at FROM tags WHERE LOWER(name) = LOWER(#{name})
+    </select>
+
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*) FROM tags WHERE LOWER(name) = LOWER(#{name})
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">

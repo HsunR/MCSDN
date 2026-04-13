@@ -11,6 +11,7 @@ public interface TagMapper {
     List<Tag> findAll();
     Tag findById(@Param("id") Long id);
     Tag findByName(@Param("name") String name);
+    int countByName(@Param("name") String name);
     int insert(Tag tag);
     int delete(@Param("id") Long id);
     List<Tag> findTagsByNames(@Param("names") List<String> names);

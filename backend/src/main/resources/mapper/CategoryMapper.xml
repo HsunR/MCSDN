@@ -20,4 +20,12 @@
     <delete id="delete">
         DELETE FROM categories WHERE id = #{id}
     </delete>
+
+    <select id="findByName" resultType="com.blog.entity.Category">
+        SELECT id, name, created_at FROM categories WHERE LOWER(name) = LOWER(#{name})
+    </select>
+
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*) FROM categories WHERE LOWER(name) = LOWER(#{name})
+    </select>
 </mapper>
