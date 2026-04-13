@@ -9,6 +9,7 @@ public class Article {
     private String content;
     private String status;
     private Long categoryId;
+    private Category category;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<Tag> tags;
@@ -23,6 +24,8 @@ public class Article {
     public void setStatus(String status) { this.status = status; }
     public Long getCategoryId() { return categoryId; }
     public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

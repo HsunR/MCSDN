@@ -56,4 +56,78 @@
     <delete id="deleteArticleTags">
         DELETE FROM article_tags WHERE article_id = #{articleId}
     </delete>
+
+    <resultMap id="ArticleWithCategoryResultMap" extends="ArticleResultMap">
+        <association property="category" javaType="com.blog.entity.Category">
+            <id property="id" column="cat_id"/>
+            <result property="name" column="category_name"/>
+        </association>
+    </resultMap>
+
+    <select id="findPublishedPaginated" resultMap="ArticleWithCategoryResultMap">
+        SELECT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
+               c.name as category_name, c.id as cat_id
+        FROM articles a
+        LEFT JOIN categories c ON a.category_id = c.id
+        WHERE a.status = 'PUBLISHED'
+        ORDER BY a.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countPublished" resultType="int">
+        SELECT COUNT(*) FROM articles WHERE status = 'PUBLISHED'
+    </select>
+
+    <select id="findByCategorySlugPaginated" resultMap="ArticleWithCategoryResultMap">
+        SELECT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
+               c.name as category_name, c.id as cat_id
+        FROM articles a
+        INNER JOIN categories c ON a.category_id = c.id
+        WHERE a.status = 'PUBLISHED' AND LOWER(c.name) = LOWER(#{categorySlug})
+        ORDER BY a.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByCategorySlug" resultType="int">
+        SELECT COUNT(*) FROM articles a
+        INNER JOIN categories c ON a.category_id = c.id
+        WHERE a.status = 'PUBLISHED' AND LOWER(c.name) = LOWER(#{categorySlug})
+    </select>
+
+    <select id="findByTagSlugPaginated" resultMap="ArticleWithCategoryResultMap">
+        SELECT DISTINCT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
+               c.name as category_name, c.id as cat_id
+        FROM articles a
+        INNER JOIN article_tags at ON a.id = at.article_id
+        INNER JOIN tags t ON at.tag_id = t.id
+        LEFT JOIN categories c ON a.category_id = c.id
+        WHERE a.status = 'PUBLISHED' AND LOWER(t.name) = LOWER(#{tagSlug})
+        ORDER BY a.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByTagSlug" resultType="int">
+        SELECT COUNT(DISTINCT a.id) FROM articles a
+        INNER JOIN article_tags at ON a.id = at.article_id
+        INNER JOIN tags t ON at.tag_id = t.id
+        WHERE a.status = 'PUBLISHED' AND LOWER(t.name) = LOWER(#{tagSlug})
+    </select>
+
+    <select id="searchPublishedPaginated" resultMap="ArticleWithCategoryResultMap">
+        SELECT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
+               c.name as category_name, c.id as cat_id,
+               MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) AS relevance
+        FROM articles a
+        LEFT JOIN categories c ON a.category_id = c.id
+        WHERE a.status = 'PUBLISHED'
+          AND MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+        ORDER BY relevance DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countSearchPublished" resultType="int">
+        SELECT COUNT(*) FROM articles a
+        WHERE a.status = 'PUBLISHED'
+          AND MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+    </select>
 </mapper>
