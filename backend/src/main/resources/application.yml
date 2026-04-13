@@ -1,21 +1,15 @@
 spring:
   application:
-    name: blog-cc-backend
-
+    name: blog-cc
   datasource:
-    url: jdbc:mysql://localhost:3306/blog_cc?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/blog_cc?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: "123456"
     driver-class-name: com.mysql.cj.jdbc.Driver
-
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-
-  web:
-    resources:
-      static-locations: file:uploads/,classpath:static/
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -23,15 +17,14 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+flyway:
+  enabled: true
+  baseline-on-migrate: true
+  locations: classpath:db/migration
+
+jwt:
+  secret: "blog-cc-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256"
+  expiration: 86400000  # 24 hours in milliseconds
+
 server:
   port: 8080
-
-app:
-  jwt:
-    secret: blog-cc-jwt-secret-key-change-in-production-must-be-at-least-256-bits
-    expiration: 86400000  # 24 hours in milliseconds
-
-logging:
-  level:
-    com.blog: DEBUG
-    org.springframework.security: DEBUG
