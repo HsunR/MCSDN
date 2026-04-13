@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
+import ImageUploadModal from './ImageUploadModal.vue'
 
 // THME-02: Configure markdown-it with highlight.js for code syntax highlighting
 const md = new MarkdownIt({
@@ -29,6 +30,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const showUploadModal = ref(false)
+
 const content = computed({
   get: () => props.modelValue || '',
   set: (value) => emit('update:modelValue', value)
@@ -41,7 +44,20 @@ const renderedHtml = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+  <div>
+    <!-- D-11: Toolbar with image upload button -->
+    <div class="mb-4 flex items-center gap-2 border-b border-gray-700 pb-2">
+      <span class="text-sm text-gray-400">Toolbar:</span>
+      <button
+        @click="showUploadModal = true"
+        class="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded hover:bg-gray-600"
+        title="Upload Image"
+      >
+        Upload Image
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
     <!-- Editor pane -->
     <div class="flex flex-col">
       <label class="text-sm font-medium text-gray-300 mb-2">Markdown</label>
@@ -67,6 +83,14 @@ const renderedHtml = computed(() => {
         ></div>
       </div>
     </div>
+    </div>
+
+    <!-- D-11, D-12: Image upload modal -->
+    <ImageUploadModal
+      :visible="showUploadModal"
+      @close="showUploadModal = false"
+      @insert="(markdown) => { content += '\n' + markdown }"
+    />
   </div>
 </template>
 

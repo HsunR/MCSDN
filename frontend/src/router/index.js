@@ -31,6 +31,38 @@ const routes = [
     name: 'ArticleEdit',
     component: () => import('../views/admin/ArticleEditorView.vue'),
     meta: { requiresAuth: true }
+  },
+
+  // NEW: Public routes (no auth required per D-03, D-04, D-05, D-06)
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('../views/public/HomeView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/article/:idSlug',
+    name: 'Article',
+    component: () => import('../views/public/ArticleView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/category/:name',
+    name: 'Category',
+    component: () => import('../views/public/CategoryView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/tag/:name',
+    name: 'Tag',
+    component: () => import('../views/public/TagView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('../views/public/SearchView.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 
