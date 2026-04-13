@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.CommentMapper">
+    <resultMap id="CommentResultMap" type="com.blog.entity.Comment">
+        <id property="id" column="id"/>
+        <result property="articleId" column="article_id"/>
+        <result property="authorName" column="author_name"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments (article_id, author_name, content, status)
+        VALUES (#{articleId}, #{authorName}, #{content}, #{status})
+    </insert>
+
+    <select id="findByArticleIdAndStatus" resultMap="CommentResultMap">
+        SELECT id, article_id, author_name, content, status, created_at
+        FROM comments
+        WHERE article_id = #{articleId} AND status = #{status}
+        ORDER BY created_at ASC
+    </select>
+
+    <select id="findAll" resultMap="CommentResultMap">
+        SELECT id, article_id, author_name, content, status, created_at
+        FROM comments
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findAllWithStatus" resultMap="CommentResultMap">
+        SELECT id, article_id, author_name, content, status, created_at
+        FROM comments
+        WHERE status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM comments WHERE status = #{status}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE comments SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM comments WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByArticleId">
+        DELETE FROM comments WHERE article_id = #{articleId}
+    </delete>
+</mapper>
