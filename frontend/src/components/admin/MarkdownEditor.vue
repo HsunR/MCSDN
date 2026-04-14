@@ -120,4 +120,12 @@ const renderedHtml = computed(() => {
 .hljs-selector-id { color: #d7ba7d; }
 .hljs-title { color: #dcdcaa; }
 .hljs-built_in { color: #4ec9b0; }
+
+/* Image styling in preview */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
 </style>

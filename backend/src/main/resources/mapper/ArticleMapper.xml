@@ -94,6 +94,14 @@
         WHERE a.status = 'PUBLISHED' AND LOWER(c.name) = LOWER(#{categorySlug})
     </select>
 
+    <select id="countByCategoryId" resultType="int">
+        SELECT COUNT(*) FROM articles WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="countByTagId" resultType="int">
+        SELECT COUNT(*) FROM article_tags WHERE tag_id = #{tagId}
+    </select>
+
     <select id="findByTagSlugPaginated" resultMap="ArticleWithCategoryResultMap">
         SELECT DISTINCT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
                c.name as category_name, c.id as cat_id

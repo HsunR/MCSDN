@@ -1,6 +1,7 @@
 package com.blog.service.impl;
 
 import com.blog.entity.Category;
+import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.CategoryService;
 import com.blog.util.SlugUtils;
@@ -14,6 +15,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private ArticleMapper articleMapper;
 
     @Override
     public List<Category> getAll() {
@@ -60,6 +64,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
+        if (articleMapper.countByCategoryId(id) > 0) {
+            throw new RuntimeException("Cannot delete category that is assigned to articles");
+        }
         categoryMapper.delete(id);
     }
 

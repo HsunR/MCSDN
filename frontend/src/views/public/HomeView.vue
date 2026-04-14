@@ -22,11 +22,7 @@ watch(() => route.query.page, (newPage) => {
 
 <template>
   <div class="max-w-6xl mx-auto px-4 py-8">
-    <!-- Sidebar on top for mobile, then main content -->
-    <aside class="lg:hidden space-y-6 mb-8">
-      <CategoryList />
-      <TagCloud />
-    </aside>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <div class="lg:col-span-3">
@@ -34,7 +30,11 @@ watch(() => route.query.page, (newPage) => {
           <h1 class="text-3xl font-bold text-gray-100 mb-6">Latest Articles</h1>
           <SearchBar />
         </div>
-
+        <!-- Sidebar on top for mobile, then main content -->
+        <aside class="lg:hidden space-y-6 mb-8">
+          <CategoryList />
+          <TagCloud />
+        </aside>
         <div v-if="store.loading" class="text-center py-12">
           <p class="text-gray-500">Loading...</p>
         </div>

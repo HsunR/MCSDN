@@ -6,9 +6,19 @@ import { ref, onMounted } from 'vue'
 const categories = ref([])
 const loading = ref(false)
 const newCategoryName = ref('')
+const deletingId = ref(null)
+const deleteError = ref('')
 
 const http = axios.create({
   baseURL: '/api'
+})
+
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem('admin_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
 })
 
 async function fetchCategories() {
@@ -31,16 +41,28 @@ async function createCategory() {
     await fetchCategories()
   } catch (err) {
     console.error('Failed to create category:', err)
-    alert('Failed to create category')
   }
 }
 
-async function deleteCategory(id) {
-  if (!confirm('Delete this category?')) return
+function startDelete(id) {
+  deletingId.value = id
+  deleteError.value = ''
+}
+
+function cancelDelete() {
+  deletingId.value = null
+  deleteError.value = ''
+}
+
+async function confirmDelete(id) {
+  deleteError.value = ''
   try {
     await http.delete(`/admin/categories/${id}`)
+    deletingId.value = null
     await fetchCategories()
   } catch (err) {
+    const msg = err.response?.data?.error || err.response?.data?.message || 'Failed to delete category'
+    deleteError.value = msg
     console.error('Failed to delete category:', err)
   }
 }
@@ -88,8 +110,24 @@ onMounted(fetchCategories)
             <span class="text-gray-100 font-medium">{{ cat.name }}</span>
             <span v-if="cat.slug" class="text-gray-500 text-sm ml-2">/category/{{ cat.slug }}</span>
           </div>
+          <div v-if="deletingId === cat.id" class="flex gap-2">
+            <button
+              @click="confirmDelete(cat.id)"
+              class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500"
+            >
+              Confirm
+            </button>
+            <button
+              @click="cancelDelete"
+              class="px-3 py-1 text-sm bg-gray-600 text-gray-200 rounded hover:bg-gray-500"
+            >
+              Cancel
+            </button>
+          </div>
+          <p v-if="deleteError && deletingId === cat.id" class="text-red-500 text-sm">{{ deleteError }}</p>
           <button
-            @click="deleteCategory(cat.id)"
+            v-else
+            @click="startDelete(cat.id)"
             class="px-4 py-1 text-red-400 hover:bg-red-900 rounded"
           >
             Delete

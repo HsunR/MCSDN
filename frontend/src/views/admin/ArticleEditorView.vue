@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useArticleStore } from '../../stores/articleStore'
 import AdminSidebar from '../../components/admin/AdminSidebar.vue'
 import MarkdownEditor from '../../components/admin/MarkdownEditor.vue'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -15,12 +16,27 @@ const articleId = computed(() => route.params.id)
 const title = ref('')
 const content = ref('')
 const status = ref('DRAFT')
-const categoryId = ref(1)
+const categoryId = ref(null)
+const categories = ref([])
 const tags = ref([])
 const tagInput = ref('')
 const saving = ref(false)
 
+const http = axios.create({
+  baseURL: '/api'
+})
+
+async function fetchCategories() {
+  try {
+    const res = await http.get('/admin/categories')
+    categories.value = res.data
+  } catch (err) {
+    console.error('Failed to fetch categories:', err)
+  }
+}
+
 onMounted(async () => {
+  await fetchCategories()
   if (isEditing.value) {
     await articleStore.fetchArticle(articleId.value)
     const article = articleStore.currentArticle
@@ -103,6 +119,19 @@ async function handleSave() {
         </div>
 
         <div class="grid grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select
+              v-model="categoryId"
+              class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:ring-2 focus:ring-blue-500"
+            >
+              <option :value="null" disabled>Select category</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
             <select

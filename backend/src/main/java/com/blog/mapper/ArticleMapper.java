@@ -21,6 +21,8 @@ public interface ArticleMapper {
     int countPublished();
     List<Article> findByCategorySlugPaginated(@Param("categorySlug") String slug, @Param("limit") int limit, @Param("offset") int offset);
     int countByCategorySlug(@Param("categorySlug") String slug);
+    int countByCategoryId(@Param("categoryId") Long categoryId);
+    int countByTagId(@Param("tagId") Long tagId);
     List<Article> findByTagSlugPaginated(@Param("tagSlug") String slug, @Param("limit") int limit, @Param("offset") int offset);
     int countByTagSlug(@Param("tagSlug") String slug);
     List<Article> searchPublishedPaginated(@Param("keyword") String keyword, @Param("limit") int limit, @Param("offset") int offset);

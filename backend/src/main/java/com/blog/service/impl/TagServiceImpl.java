@@ -47,6 +47,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void delete(Long id) {
+        if (articleMapper.countByTagId(id) > 0) {
+            throw new RuntimeException("Cannot delete tag that is assigned to articles");
+        }
         tagMapper.delete(id);
     }
 
