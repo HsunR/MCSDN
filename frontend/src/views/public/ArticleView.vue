@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
+import CommentSection from '../../components/CommentSection.vue'
 
 const route = useRoute()
 const store = usePublicArticleStore()
@@ -78,6 +79,7 @@ onMounted(() => {
       <!-- Content with markdown rendering (PUBL-02) -->
       <div class="prose prose-invert max-w-none" v-html="renderedContent"></div>
     </article>
+    <CommentSection v-if="article" :articleId="article.id.toString()" />
     <div v-else class="text-center py-12">
       <p class="text-gray-500">Article not found.</p>
     </div>
