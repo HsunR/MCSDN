@@ -4,13 +4,11 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import ImageUploadModal from './ImageUploadModal.vue'
 
-// THME-02: Configure markdown-it with highlight.js for code syntax highlighting
 const md = new MarkdownIt({
-  html: false,
+  html: true,
   linkify: true,
   typographer: true,
   highlight: function (str, lang) {
-    // Support JS/TS/Python/Go/Java/SQL
     const supportedLanguages = ['javascript', 'typescript', 'python', 'go', 'java', 'sql', 'json', 'bash', 'yaml']
     if (lang && supportedLanguages.includes(lang)) {
       try {
