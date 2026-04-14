@@ -2,19 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.blog.mapper.CategoryMapper">
     <select id="findAll" resultType="com.blog.entity.Category">
-        SELECT id, name, created_at FROM categories ORDER BY name
+        SELECT id, name, slug, created_at FROM categories ORDER BY name
     </select>
 
     <select id="findById" resultType="com.blog.entity.Category">
-        SELECT id, name, created_at FROM categories WHERE id = #{id}
+        SELECT id, name, slug, created_at FROM categories WHERE id = #{id}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO categories (name) VALUES (#{name})
+        INSERT INTO categories (name, slug) VALUES (#{name}, #{slug})
     </insert>
 
     <update id="update">
-        UPDATE categories SET name = #{name} WHERE id = #{id}
+        UPDATE categories SET name = #{name}, slug = #{slug} WHERE id = #{id}
     </update>
 
     <delete id="delete">
@@ -22,7 +22,11 @@
     </delete>
 
     <select id="findByName" resultType="com.blog.entity.Category">
-        SELECT id, name, created_at FROM categories WHERE LOWER(name) = LOWER(#{name})
+        SELECT id, name, slug, created_at FROM categories WHERE LOWER(name) = LOWER(#{name})
+    </select>
+
+    <select id="findBySlug" resultType="com.blog.entity.Category">
+        SELECT id, name, slug, created_at FROM categories WHERE slug = #{slug}
     </select>
 
     <select id="countByName" resultType="int">

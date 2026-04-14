@@ -38,6 +38,18 @@ const routes = [
     component: () => import('../views/admin/AdminCommentsView.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/admin/categories',
+    name: 'CategoryManagement',
+    component: () => import('../views/admin/CategoryManagementView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/tags',
+    name: 'TagManagement',
+    component: () => import('../views/admin/TagManagementView.vue'),
+    meta: { requiresAuth: true }
+  },
 
   // NEW: Public routes (no auth required per D-03, D-04, D-05, D-06)
   {

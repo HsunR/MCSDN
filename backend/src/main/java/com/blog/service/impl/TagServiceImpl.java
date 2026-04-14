@@ -4,6 +4,7 @@ import com.blog.entity.Tag;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.TagMapper;
 import com.blog.service.TagService;
+import com.blog.util.SlugUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class TagServiceImpl implements TagService {
         }
         Tag tag = new Tag();
         tag.setName(name);
+        tag.setSlug(SlugUtils.slugify(name));
         tagMapper.insert(tag);
         return tag;
     }

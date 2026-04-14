@@ -57,6 +57,22 @@ function handleLogout() {
           {{ commentStore.pendingCount > 9 ? '9+' : commentStore.pendingCount }}
         </span>
       </router-link>
+
+      <router-link
+        to="/admin/categories"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors"
+        :class="route.path.startsWith('/admin/categories') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
+      >
+        Categories
+      </router-link>
+
+      <router-link
+        to="/admin/tags"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors"
+        :class="route.path.startsWith('/admin/tags') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
+      >
+        Tags
+      </router-link>
     </nav>
 
     <div class="p-4 border-t border-gray-800">

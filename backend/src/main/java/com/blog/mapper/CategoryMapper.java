@@ -11,6 +11,7 @@ public interface CategoryMapper {
     List<Category> findAll();
     Category findById(@Param("id") Long id);
     Category findByName(@Param("name") String name);
+    Category findBySlug(@Param("slug") String slug);
     int countByName(@Param("name") String name);
     int insert(Category category);
     int update(Category category);

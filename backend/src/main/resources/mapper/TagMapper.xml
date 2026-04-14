@@ -2,15 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.blog.mapper.TagMapper">
     <select id="findAll" resultType="com.blog.entity.Tag">
-        SELECT id, name, created_at FROM tags ORDER BY name
+        SELECT id, name, slug, created_at FROM tags ORDER BY name
     </select>
 
     <select id="findById" resultType="com.blog.entity.Tag">
-        SELECT id, name, created_at FROM tags WHERE id = #{id}
+        SELECT id, name, slug, created_at FROM tags WHERE id = #{id}
     </select>
 
     <select id="findByName" resultType="com.blog.entity.Tag">
-        SELECT id, name, created_at FROM tags WHERE LOWER(name) = LOWER(#{name})
+        SELECT id, name, slug, created_at FROM tags WHERE LOWER(name) = LOWER(#{name})
+    </select>
+
+    <select id="findBySlug" resultType="com.blog.entity.Tag">
+        SELECT id, name, slug, created_at FROM tags WHERE slug = #{slug}
     </select>
 
     <select id="countByName" resultType="int">

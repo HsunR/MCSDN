@@ -24,7 +24,7 @@
 | Frontend URL  | `http://localhost:5173`                 |
 | MySQL         | `localhost:3306`, password `123456`     |
 | Default Admin | username: `admin`, password: `admin123` |
-| Browser       | Chromium (Playwright default)           |
+| Browser       | Chromium                                |
 
 ### 1.3 Test Categories
 
@@ -94,7 +94,7 @@
 | ------ | --------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------- | -------- |
 | PUB-10 | Article detail loads        | 1. Click an article card                                            | Navigate to `/article/:id-slug`, article content renders | P0       |
 | PUB-11 | Markdown renders correctly  | 1. View article with markdown content                               | Headings, lists, bold, italic render as HTML             | P0       |
-| PUB-12 | Code blocks highlight       | 1. View article with code blocks (`js, ` java, etc.)                | Syntax highlighting applied, language label shown        | P0       |
+| PUB-12 | Code blocks highlight       | 1. View article with code blocks (`js, `  java, etc.)               | Syntax highlighting applied, language label shown        | P0       |
 | PUB-13 | Images display inline       | 1. View article with inline images                                  | Images load and display at correct size                  | P1       |
 | PUB-14 | Article shows category link | 1. View article detail                                              | Category name clickable, links to category page          | P1       |
 | PUB-15 | Article shows tag links     | 1. View article detail                                              | Tags clickable, link to tag pages                        | P1       |
@@ -288,25 +288,6 @@ INSERT INTO tags (name) VALUES ('Java'), ('Vue'), ('Spring Boot'), ('Docker');
 -- At least one published article for public browsing tests
 INSERT INTO articles (title, content, status, category_id) VALUES
 ('Welcome to My Blog', '# Welcome\n\nThis is my first article.', 'PUBLISHED', 1);
-```
-
-***
-
-## 13. Playwright Test Structure (Reference)
-
-```javascript
-// e2e/auth.spec.js
-import { test, expect } from '@playwright/test';
-
-test.describe('Authentication', () => {
-  test('AUTH-01: login with valid credentials', async ({ page }) => {
-    await page.goto('/admin/login');
-    await page.fill('[name="username"]', 'admin');
-    await page.fill('[name="password"]', 'admin123');
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/admin');
-  });
-});
 ```
 
 ***

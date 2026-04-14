@@ -57,7 +57,7 @@
         DELETE FROM article_tags WHERE article_id = #{articleId}
     </delete>
 
-    <resultMap id="ArticleWithCategoryResultMap" extends="ArticleResultMap">
+    <resultMap id="ArticleWithCategoryResultMap" type="com.blog.entity.Article" extends="ArticleResultMap">
         <association property="category" javaType="com.blog.entity.Category">
             <id property="id" column="cat_id"/>
             <result property="name" column="category_name"/>
@@ -115,19 +115,36 @@
 
     <select id="searchPublishedPaginated" resultMap="ArticleWithCategoryResultMap">
         SELECT a.id, a.title, a.content, a.status, a.category_id, a.created_at, a.updated_at,
-               c.name as category_name, c.id as cat_id,
-               MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) AS relevance
+               c.name as category_name, c.id as cat_id
         FROM articles a
         LEFT JOIN categories c ON a.category_id = c.id
         WHERE a.status = 'PUBLISHED'
-          AND MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-        ORDER BY relevance DESC
+        <if test="keyword != null and keyword.trim().length() >= 2">
+          AND (
+            MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+            OR LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+          )
+        </if>
+        <if test="keyword == null or keyword.trim().length() &lt; 2">
+          AND 1=0
+        </if>
+        ORDER BY a.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="countSearchPublished" resultType="int">
         SELECT COUNT(*) FROM articles a
         WHERE a.status = 'PUBLISHED'
-          AND MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+        <if test="keyword != null and keyword.trim().length() >= 2">
+          AND (
+            MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+            OR LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+          )
+        </if>
+        <if test="keyword == null or keyword.trim().length() &lt; 2">
+          AND 1=0
+        </if>
     </select>
 </mapper>
