@@ -68,7 +68,7 @@ Phase 3 implements a public comment submission system with admin moderation. Pub
 ### Backend (already defined in CLAUDE.md — confirming versions)
 
 | Library | Version | Purpose | Why Standard |
-|---------|---------|---------|--------------|
+|---------|---------|--------|--------------|
 | Spring Boot | 3.2.x | REST API framework | Already in use |
 | MyBatis | 3.0.x | SQL mapping | Already in use, gives SQL visibility |
 | MySQL | 8.0+ | Database | Already connected at localhost:3306 |
@@ -552,7 +552,7 @@ onMounted(loadComments)
         >
           <div class="flex items-start justify-between">
             <div>
-              <span class="font-semibold text-gray-100">{{ comment.authorName }}</span>
+              <span class="font-semibold text-gray-100">{{ comment.authorName}</span>
               <span class="text-gray-500 text-sm ml-3">{{ formatDate(comment.createdAt) }}</span>
               <span :class="[
                 'ml-3 px-2 py-0.5 text-xs rounded',
@@ -847,15 +847,15 @@ public interface CommentMapper {
 
 ## Open Questions
 
-1. **Should admin GET `/api/admin/comments` support pagination?**
+1. **RESOLVED: Should admin GET `/api/admin/comments` support pagination?**
    - What we know: Phase 3 admin comment list shows all comments without pagination (A5)
    - What's unclear: How many comments is "too many" for a single page load
-   - Recommendation: Add pagination if comment volume can exceed ~50 items; otherwise skip for v1 simplicity
+   - Resolution: Skip pagination for v1 simplicity. If comment volume exceeds ~50 items, pagination can be added in a later phase. Admin can manage reasonable volumes without pagination in initial release.
 
-2. **Should `author_name` be sanitized on input or on output?**
+2. **RESOLVED: Should `author_name` be sanitized on input or on output?**
    - What we know: markdown-it already handles article content rendering; comments are plain text
    - What's unclear: Whether special characters in names (emoji, CJK) need normalization
-   - Recommendation: Store as-is, escape on output with Vue `{{ }}` interpolation
+   - Resolution: Store as-is, escape on output with Vue `{{ }}` interpolation. Vue's text interpolation automatically escapes HTML entities, so no sanitization needed on input. Special characters (emoji, CJK) are preserved without normalization.
 
 ---
 
@@ -973,7 +973,7 @@ Phase 3 adds only local code changes:
 ### Secondary (MEDIUM confidence)
 
 - [Spring Boot MyBatis integration docs](https://docs.spring.io/spring-boot/docs/current/reference/html/data.html#data.sql.mybatis) — MyBatis Spring Boot Starter usage (standard practice)
-- [Vue 3 Composition API docs](https://vuejs.org/api/composition-api-setup.html) — `<script setup>` syntax
+- [Vue 3 Composition API docs](https://vuejs.org/api/completion-api/setup.html) — `<script setup>` syntax
 - [Pinia state management](https://pinia.vuejs.org/core-concepts/) — defineStore pattern
 
 ### Tertiary (LOW confidence)

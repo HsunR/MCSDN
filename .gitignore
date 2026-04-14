@@ -32,3 +32,8 @@ uploads/
 # OS
 .DS_Store
 Thumbs.db
+
+
+# .claudeCode
+.claude/
+
