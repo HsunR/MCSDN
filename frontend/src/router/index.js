@@ -32,6 +32,12 @@ const routes = [
     component: () => import('../views/admin/ArticleEditorView.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/admin/comments',
+    name: 'AdminComments',
+    component: () => import('../views/admin/AdminCommentsView.vue'),
+    meta: { requiresAuth: true }
+  },
 
   // NEW: Public routes (no auth required per D-03, D-04, D-05, D-06)
   {

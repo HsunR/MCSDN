@@ -1,10 +1,19 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/authStore'
+import { useCommentStore } from '../../stores/commentStore'
+import { ref, onMounted } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const commentStore = useCommentStore()
+const pendingCount = ref(0)
+
+onMounted(() => {
+  commentStore.fetchPendingCount()
+  pendingCount.value = commentStore.pendingCount
+})
 
 function handleLogout() {
   authStore.logout()
@@ -33,6 +42,20 @@ function handleLogout() {
         :class="route.path.startsWith('/admin/articles') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
       >
         Articles
+      </router-link>
+
+      <router-link
+        to="/admin/comments"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors relative"
+        :class="route.path.startsWith('/admin/comments') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
+      >
+        Comments
+        <span
+          v-if="commentStore.pendingCount > 0"
+          class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+        >
+          {{ commentStore.pendingCount > 9 ? '9+' : commentStore.pendingCount }}
+        </span>
       </router-link>
     </nav>
 
