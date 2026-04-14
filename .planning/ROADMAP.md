@@ -8,7 +8,7 @@ A personal blog for a programmer, featuring a dark-themed admin backend for cont
 
 - [x] **Phase 1: Admin Backend & Dark Theme** - JWT auth, article management, dark UI
 - [x] **Phase 2: Public Blog & Image Upload** - Public frontend, categories/tags, image storage
-- [ ] **Phase 3: Comments** - Public comments with admin moderation
+- [x] **Phase 3: Comments** - Public comments with admin moderation (completed 2026-04-14)
 
 ## Phase Details
 
@@ -55,9 +55,9 @@ A personal blog for a programmer, featuring a dark-themed admin backend for cont
   4. Admin can delete any comment (CMNT-04)
   5. Approved comments display on the article page (CMNT-05)
 **Plans**:
-- [ ] 03-01-PLAN.md — Database + Backend API (Flyway migration, entity, mapper, service, controllers)
-- [ ] 03-02-PLAN.md — Admin Frontend (AdminCommentsView, commentStore, adminCommentApi, router, sidebar)
-- [ ] 03-03-PLAN.md — Public Frontend (CommentSection, commentApi, ArticleView integration)
+- [x] 03-01-PLAN.md — Database + Backend API (Flyway migration, entity, mapper, service, controllers)
+- [x] 03-02-PLAN.md — Admin Frontend (AdminCommentsView, commentStore, adminCommentApi, router, sidebar)
+- [x] 03-03-PLAN.md — Public Frontend (CommentSection, commentApi, ArticleView integration)
 
 ## Progress
 
@@ -65,4 +65,4 @@ A personal blog for a programmer, featuring a dark-themed admin backend for cont
 |-------|----------------|--------|-----------|
 | 1. Admin Backend & Dark Theme | 3/3 | ✅ Complete | 2026-04-13 |
 | 2. Public Blog & Image Upload | 3/3 | ✅ Complete | 2026-04-13 |
-| 3. Comments | 0/3 | Ready to execute | - |
+| 3. Comments | 3/3 | Complete    | 2026-04-14 |
