@@ -1,147 +1,89 @@
-# Requirements: Personal Blog
+# Requirements: 个人博客系统 v1.1
 
-**Defined:** 2026-04-13
-**Core Value:** 快速搭建一个属于自己的技术博客空间，专注于内容创作
+**Defined:** 2026-04-15
+**Core Value:** 快速搭建一个属于自己的技术博客空间，专注于内容创作，无需操心复杂功能。
 
 ## v1 Requirements
 
-### Authentication
+### CSDN 同步配置
 
-- [ ] **AUTH-01**: Admin can log in with username/password
-- [ ] **AUTH-02**: JWT token issued on successful login (stateless)
-- [ ] **AUTH-03**: Admin API endpoints validate JWT on every request
-- [ ] **AUTH-04**: Login rate limited (5 attempts per minute per IP)
-- [ ] **AUTH-05**: Admin can log out (token invalidated client-side)
+- [ ] **SYNC-01**: 管理员可在后台配置 CSDN userId（如 `2301_78723800`）
+- [ ] **SYNC-02**: 管理员可指定同步文章的目标分类（下拉选择已有分类）
+- [ ] **SYNC-03**: 同步配置持久化到数据库（CsdnSyncConfig 表）
 
-### Article Management
+### CSDN 文章同步
 
-- [ ] **ARTL-01**: Admin can create new article with title, content (Markdown), category, tags
-- [ ] **ARTL-02**: Admin can edit existing articles
-- [ ] **ARTL-03**: Admin can delete articles (with associated comments)
-- [ ] **ARTL-04**: Articles support Markdown with code syntax highlighting (JS/TS/Python/Go/Java/SQL)
-- [ ] **ARTL-05**: Article has published/draft status
-- [ ] **ARTL-06**: Articles have created_at and updated_at timestamps
+- [ ] **SYNC-04**: 管理员点击"同步"按钮，立即从 CSDN 拉取配置用户的所有文章列表
+- [ ] **SYNC-05**: 根据 CSDN articleId 判断文章是否存在（去重）：
+  - 不存在 → 新增导入（发布状态）
+  - 存在且远程更新过 → 增量更新
+  - 存在且未更新 → 跳过
+- [ ] **SYNC-06**: 解析 CSDN 文章 HTML，提取标题、内容、标签（tags）
+- [ ] **SYNC-07**: HTML 内容中的 CSDN 图片 URL 替换为本地存储路径
+- [ ] **SYNC-08**: 同步后的文章标记 `source: CSDN`，记录 `csdn_article_id`
+- [ ] **SYNC-09**: 图片根据 URL hash（MD5）去重，已存在的图片不重复下载
 
-### Categories & Tags
+### 同步管理界面
 
-- [ ] **CTGY-01**: Admin can create/edit/delete categories
-- [ ] **CTGY-02**: Admin can create/edit/delete tags
-- [ ] **CTGY-03**: Articles can have one category and multiple tags
-- [ ] **CTGY-04**: Public can filter articles by category
-- [ ] **CTGY-05**: Public can filter articles by tag
+- [ ] **SYNC-10**: 后台显示同步配置表单（CSDN userId 输入框 + 目标分类下拉）
+- [ ] **SYNC-11**: 后台显示"同步"按钮，点击触发同步
+- [ ] **SYNC-12**: 后台显示同步结果（成功/失败/跳过数量）
+- [ ] **SYNC-13**: 编辑同步文章时，弹窗警告"该文章为同步文章，不建议编辑"
 
-### Public Blog (Frontend)
+### 数据库迁移
 
-- [ ] **PUBL-01**: Public can view article list (paginated, 10 per page)
-- [ ] **PUBL-02**: Public can view full article with rendered Markdown
-- [ ] **PUBL-03**: Public can view article by category
-- [ ] **PUBL-04**: Public can view article by tag
-- [ ] **PUBL-05**: Public can search articles by keyword (MySQL full-text)
-- [ ] **PUBL-06**: Article list shows title, date, category, excerpt (first 150 chars)
-
-### Comments
-
-- [ ] **CMNT-01**: Public can submit comments on articles (name + content, no auth required)
-- [ ] **CMNT-02**: Comments default to PENDING status (not publicly visible)
-- [ ] **CMNT-03**: Admin can approve/reject pending comments
-- [ ] **CMNT-04**: Admin can delete comments
-- [ ] **CMNT-05**: Approved comments display on article page
-
-### Image Upload
-
-- [ ] **IMGE-01**: Admin can upload images via API
-- [ ] **IMGE-02**: Images stored on local filesystem (`/uploads/{year}/{month}/{uuid}.{ext}`)
-- [ ] **IMGE-03**: Images served via Spring Boot static file handler
-- [ ] **IMGE-04**: Image URLs inserted into Markdown content as `![alt](/uploads/...)`
-- [ ] **IMGE-05**: Max file size: 5MB per image
-- [ ] **IMGE-06**: Allowed types: jpg, jpeg, png, gif, webp
-
-### Dark Theme (UI)
-
-- [ ] **THME-01**: Entire site uses dark color scheme
-- [ ] **THME-02**: Code blocks use dark syntax highlighting theme (dracula/github-dark)
-- [ ] **THME-03**: All form inputs styled for dark mode
-- [ ] **THME-04**: `color-scheme: dark` applied for native browser controls
+- [ ] **SYNC-14**: Flyway V2 — 新增 `csdn_sync_config` 表（user_id, category_id, enabled, last_sync_at）
+- [ ] **SYNC-15**: Flyway V3 — 文章表新增 `source` 字段（varchar，nullable）和 `csdn_article_id` 字段（varchar，nullable，unique）
 
 ## v2 Requirements
 
-### Notifications (Deferred)
+（定时自动同步，移至 v1.2）
 
-- **NOTF-01**: Admin receives notification when new comment submitted
-- **NOTF-02**: Admin can configure notification preferences
+### 定时同步
 
-### Performance (Deferred)
-
-- **PERF-01**: Add Redis cache for hot posts
-- **PERF-02**: Image compression on upload (WebP, max 200KB)
-
-### SEO (Deferred)
-
-- **SEO-01**: Auto-generate sitemap.xml
-- **SEO-02**: Open Graph meta tags for social sharing
+- **SYNC-16**: 开启/关闭定时同步开关
+- **SYNC-17**: 配置定时同步 cron 表达式
+- **SYNC-18**: 定时任务按配置时间自动执行同步
+- **SYNC-19**: 定时同步异步执行，不阻塞主线程
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Social login (OAuth) | Local deployment, single admin, password auth sufficient |
-| Multi-user accounts | Single-admin blog, complexity not justified |
-| Analytics/visitor tracking | Local deployment, privacy-first |
-| Email notifications | SMTP dependency, local deploy relay issues |
-| RSS/Atom feeds | Not critical for v1 personal blog |
-| Theme toggle (dark/light) | Explicitly dark-only, no value in toggle |
-| Mobile native app | Out of scope for personal blog |
-| Third-party comments (Disqus) | Privacy concern, self-hosted preferred |
-| Content versioning | Significant complexity, not needed |
-| Scheduled publishing | Publish-now sufficient for personal use |
+| CSDN OAuth 登录 | 单人运营，不需要打通 CSDN 账号体系 |
+| 同步文章删除 | 保留本地文章，CSDN 删除不影响 |
+| 按标签选择性同步 | v1 只做全量同步，按标签筛选 v2 再做 |
+| CSDN 评论同步 | 评论系统独立，不从 CSDN 拉取 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| ARTL-01 | Phase 1 | Pending |
-| ARTL-02 | Phase 1 | Pending |
-| ARTL-03 | Phase 1 | Pending |
-| ARTL-04 | Phase 1 | Pending |
-| ARTL-05 | Phase 1 | Pending |
-| ARTL-06 | Phase 1 | Pending |
-| CTGY-01 | Phase 2 | Pending |
-| CTGY-02 | Phase 2 | Pending |
-| CTGY-03 | Phase 2 | Pending |
-| CTGY-04 | Phase 2 | Pending |
-| CTGY-05 | Phase 2 | Pending |
-| PUBL-01 | Phase 2 | Pending |
-| PUBL-02 | Phase 2 | Pending |
-| PUBL-03 | Phase 2 | Pending |
-| PUBL-04 | Phase 2 | Pending |
-| PUBL-05 | Phase 2 | Pending |
-| PUBL-06 | Phase 2 | Pending |
-| CMNT-01 | Phase 3 | Pending |
-| CMNT-02 | Phase 3 | Pending |
-| CMNT-03 | Phase 3 | Pending |
-| CMNT-04 | Phase 3 | Pending |
-| CMNT-05 | Phase 3 | Pending |
-| IMGE-01 | Phase 2 | Pending |
-| IMGE-02 | Phase 2 | Pending |
-| IMGE-03 | Phase 2 | Pending |
-| IMGE-04 | Phase 2 | Pending |
-| IMGE-05 | Phase 2 | Pending |
-| IMGE-06 | Phase 2 | Pending |
-| THME-01 | Phase 1 | Pending |
-| THME-02 | Phase 1 | Pending |
-| THME-03 | Phase 1 | Pending |
-| THME-04 | Phase 1 | Pending |
+| SYNC-01 | Phase 1 | Pending |
+| SYNC-02 | Phase 1 | Pending |
+| SYNC-03 | Phase 1 | Pending |
+| SYNC-04 | Phase 1 | Pending |
+| SYNC-05 | Phase 1 | Pending |
+| SYNC-06 | Phase 1 | Pending |
+| SYNC-07 | Phase 1 | Pending |
+| SYNC-08 | Phase 1 | Pending |
+| SYNC-09 | Phase 2 | Pending |
+| SYNC-10 | Phase 2 | Pending |
+| SYNC-11 | Phase 2 | Pending |
+| SYNC-12 | Phase 2 | Pending |
+| SYNC-13 | Phase 2 | Pending |
+| SYNC-14 | Phase 1 | Pending |
+| SYNC-15 | Phase 1 | Pending |
+| SYNC-16 | v1.2 | Pending |
+| SYNC-17 | v1.2 | Pending |
+| SYNC-18 | v1.2 | Pending |
+| SYNC-19 | v1.2 | Pending |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
+- v1 requirements: 15 total
+- Mapped to phases: 15
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-13*
-*Last updated: 2026-04-13 after initial definition*
+*Requirements defined: 2026-04-15*
+*Last updated: 2026-04-15 after initial definition*
