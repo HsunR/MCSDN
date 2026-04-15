@@ -73,11 +73,43 @@ _(None yet — start v1.1 with `/gsd-new-milestone`)_
 | Flyway 数据库迁移 | 版本控制的 schema 变更 | ✅ 验证可行 |
 | Dark theme only | 程序员风格，无需 light 切换 | ✅ 验证可行 |
 
+## Current Milestone: v1.1 CSDN 文章同步
+
+**Goal:** 让用户把 CSDN 博客文章一键同步到本博客系统，包含图片本地化和标签同步
+
+**Target features:**
+- CSDN 同步工具增强 — 解析 CSDN 文章页提取 tags，复用图片下载逻辑
+- 同步配置 API — 后台配置 CSDN userId + 目标分类 + 定时开关
+- 文章解析导入 — 解析 HTML → Markdown，提取标题/内容/标签，下载图片到本地
+- 手动同步 — 后台点击"同步"按钮立即执行
+- 定时自动同步 — 可开启，每天按配置时间自动拉取新文章
+- 同步去重 + 增量更新 — 根据 CSDN articleId 判断：新增/增量更新/跳过
+- 图片去重 — 根据 URL hash 去重，已存在的图片不重复下载
+- 同步文章标记 — `source: CSDN`, `csdn_article_id: xxx`
+- 编辑警告 — 编辑同步文章时弹窗提醒"该文章为同步文章，不建议编辑"
+
 ## Constraints
 
 - **数据库**：MySQL 本地安装，端口 3306，密码 123456
 - **存储**：图片存储在服务器本地文件系统
 - **部署**：仅开发阶段本地运行，不考虑生产部署
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-04-15 after v1.0 MVP milestone*
+*Last updated: 2026-04-15 after v1.1 milestone started*
