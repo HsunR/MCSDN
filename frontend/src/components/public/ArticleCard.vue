@@ -3,7 +3,6 @@ const props = defineProps({
   article: {
     type: Object,
     required: true
-    // { id, slug, title, excerpt, tags: [], createdAt, category: { name, slug } }
   }
 })
 

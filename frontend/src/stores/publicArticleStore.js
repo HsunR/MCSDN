@@ -14,10 +14,11 @@ export const usePublicArticleStore = defineStore('publicArticle', () => {
 
   // PUBL-06: Helper to generate excerpt from markdown (150 chars, stripped)
   function generateExcerpt(markdown, maxLength = 150) {
-    // Use striptags to strip HTML/Markdown
     const striptags = (str) => {
-      // Fallback simple strip if not loaded
-      return str.replace(/<[^>]*>/g, '').replace(/[#*`_~\[\]()]/g, '')
+      return str
+        .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+        .replace(/<[^>]*>/g, '')
+        .replace(/[#*`_~\[\]()]/g, '')
     }
     const plain = striptags(markdown)
       .replace(/\s+/g, ' ')

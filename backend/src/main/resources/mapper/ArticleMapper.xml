@@ -127,14 +127,13 @@
         FROM articles a
         LEFT JOIN categories c ON a.category_id = c.id
         WHERE a.status = 'PUBLISHED'
-        <if test="keyword != null and keyword.trim().length() >= 2">
+        <if test="keyword != null and keyword.length() &gt;= 2">
           AND (
-            MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-            OR LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-            OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            LOWER(a.title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+            OR LOWER(a.content) LIKE CONCAT('%', LOWER(#{keyword}), '%')
           )
         </if>
-        <if test="keyword == null or keyword.trim().length() &lt; 2">
+        <if test="keyword == null or keyword.length() &lt; 2">
           AND 1=0
         </if>
         ORDER BY a.created_at DESC
@@ -144,14 +143,13 @@
     <select id="countSearchPublished" resultType="int">
         SELECT COUNT(*) FROM articles a
         WHERE a.status = 'PUBLISHED'
-        <if test="keyword != null and keyword.trim().length() >= 2">
+        <if test="keyword != null and keyword.length() &gt;= 2">
           AND (
-            MATCH(a.title, a.content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-            OR LOWER(a.title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-            OR LOWER(a.content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            LOWER(a.title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+            OR LOWER(a.content) LIKE CONCAT('%', LOWER(#{keyword}), '%')
           )
         </if>
-        <if test="keyword == null or keyword.trim().length() &lt; 2">
+        <if test="keyword == null or keyword.length() &lt; 2">
           AND 1=0
         </if>
     </select>

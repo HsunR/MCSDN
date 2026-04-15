@@ -5,6 +5,7 @@ import { onMounted, ref, computed } from 'vue'
 
 const commentStore = useCommentStore()
 const activeTab = ref('PENDING')
+const deletingId = ref(null)
 
 const tabs = ['PENDING', 'APPROVED', 'REJECTED']
 
@@ -43,16 +44,26 @@ async function handleTabClick(status) {
 
 async function handleApprove(id) {
   await commentStore.approve(id)
+  await commentStore.fetchAll(activeTab.value)
 }
 
 async function handleReject(id) {
   await commentStore.reject(id)
+  await commentStore.fetchAll(activeTab.value)
+}
+
+function confirmDelete(id) {
+  deletingId.value = id
 }
 
 async function handleDelete(id) {
-  if (confirm('Are you sure you want to delete this comment?')) {
-    await commentStore.deleteComment(id)
-  }
+  await commentStore.deleteComment(id)
+  deletingId.value = null
+  await commentStore.fetchAll(activeTab.value)
+}
+
+function cancelDelete() {
+  deletingId.value = null
 }
 
 onMounted(() => {
@@ -131,8 +142,23 @@ onMounted(() => {
             >
               Reject
             </button>
+            <template v-if="deletingId === comment.id">
+              <button
+                @click="handleDelete(comment.id)"
+                class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+              >
+                Confirm
+              </button>
+              <button
+                @click="cancelDelete"
+                class="px-4 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+              >
+                Cancel
+              </button>
+            </template>
             <button
-              @click="handleDelete(comment.id)"
+              v-else
+              @click="confirmDelete(comment.id)"
               class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
             >
               Delete

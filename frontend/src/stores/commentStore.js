@@ -24,7 +24,6 @@ export const useCommentStore = defineStore('comment', () => {
     error.value = null
     try {
       await adminCommentApi.approve(id)
-      await refreshCurrentTab()
     } catch (e) {
       error.value = e.message
     }
@@ -34,7 +33,6 @@ export const useCommentStore = defineStore('comment', () => {
     error.value = null
     try {
       await adminCommentApi.reject(id)
-      await refreshCurrentTab()
     } catch (e) {
       error.value = e.message
     }
@@ -44,7 +42,6 @@ export const useCommentStore = defineStore('comment', () => {
     error.value = null
     try {
       await adminCommentApi.delete(id)
-      await refreshCurrentTab()
     } catch (e) {
       error.value = e.message
     }
@@ -58,13 +55,6 @@ export const useCommentStore = defineStore('comment', () => {
       // silently fail for badge count
       pendingCount.value = 0
     }
-  }
-
-  // Helper to refresh based on current active tab (called after mutations)
-  async function refreshCurrentTab() {
-    // Determine current status from existing comments or default to PENDING
-    const currentStatus = comments.value.length > 0 ? comments.value[0].status : 'PENDING'
-    await fetchAll(currentStatus)
   }
 
   return {
