@@ -9,6 +9,9 @@
         <result property="categoryId" column="category_id"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="source" column="source"/>
+        <result property="csdnArticleId" column="csdn_article_id"/>
+        <result property="contentHash" column="content_hash"/>
     </resultMap>
 
     <select id="findAll" resultMap="ArticleResultMap">
@@ -153,4 +156,18 @@
           AND 1=0
         </if>
     </select>
+
+    <select id="findByCsdnArticleId" resultMap="ArticleResultMap">
+        SELECT id, title, content, status, category_id, created_at, updated_at, source, csdn_article_id, content_hash
+        FROM articles
+        WHERE csdn_article_id = #{csdnArticleId}
+    </select>
+
+    <update id="updateContentAndHash">
+        UPDATE articles
+        SET content = #{content},
+            content_hash = #{contentHash},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
 </mapper>

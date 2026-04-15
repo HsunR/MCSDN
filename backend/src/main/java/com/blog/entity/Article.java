@@ -13,6 +13,9 @@ public class Article {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<Tag> tags;
+    private String source;
+    private String csdnArticleId;
+    private String contentHash;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -32,4 +35,10 @@ public class Article {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public List<Tag> getTags() { return tags; }
     public void setTags(List<Tag> tags) { this.tags = tags; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+    public String getCsdnArticleId() { return csdnArticleId; }
+    public void setCsdnArticleId(String csdnArticleId) { this.csdnArticleId = csdnArticleId; }
+    public String getContentHash() { return contentHash; }
+    public void setContentHash(String contentHash) { this.contentHash = contentHash; }
 }
