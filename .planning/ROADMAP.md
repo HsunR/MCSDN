@@ -41,10 +41,14 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 3. Admin can trigger manual sync that fetches articles from CSDN and imports them as published posts
 4. Duplicate CSDN articles are detected by csdn_article_id and skipped or updated (not duplicated)
 5. Parsed articles have `source: CSDN` and `csdn_article_id` recorded in database
-6. Flyway V2 migration creates `csdn_sync_config` table
-7. Flyway V3 migration adds `source` and `csdn_article_id` columns to articles table
+6. Flyway V6 migration creates `csdn_sync_config` table
+7. Flyway V7 migration adds `source` and `csdn_article_id` columns to articles table
 
-**Plans:** TBD
+**Plans:** 4 plans
+- [x] .planning/phases/04-core-sync-infrastructure/04-01-PLAN.md — Jsoup dependency + Flyway V6/V7 migrations (Wave 1)
+- [x] .planning/phases/04-core-sync-infrastructure/04-02-PLAN.md — CSDN Article Fetcher + Parser + Converter (Wave 2)
+- [x] .planning/phases/04-core-sync-infrastructure/04-03-PLAN.md — Sync Config entity/mapper/service + Sync Orchestrator (Wave 2)
+- [x] .planning/phases/04-core-sync-infrastructure/04-04-PLAN.md — Admin REST Endpoints for sync (Wave 3)
 
 **UI hint:** yes
 
@@ -79,7 +83,7 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 | 1. Admin Backend & Dark Theme | 3/3 | ✅ Complete | 2026-04-13 |
 | 2. Public Blog & Image Upload | 3/3 | ✅ Complete | 2026-04-13 |
 | 3. Comments | 3/3 | ✅ Complete | 2026-04-14 |
-| 4. Core Sync Infrastructure | 0/N | Not started | - |
+| 4. Core Sync Infrastructure | 4/4 | ✅ Planned | - |
 | 5. Image Handling & Sync UI | 0/N | Not started | - |
 
 ---
