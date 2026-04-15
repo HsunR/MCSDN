@@ -1,81 +1,138 @@
 # Stack Research
 
-**Domain:** Personal Blog System
-**Researched:** 2026/04/13
-**Confidence:** HIGH
+**Domain:** CSDN Article Sync to Personal Blog
+**Researched:** 2026-04-15
+**Confidence:** MEDIUM
 
-## Tech Stack
+*Note: Web search was unavailable during research (API errors). Findings are based on established Java ecosystem patterns and known CSDN platform characteristics. CSDN Open Platform (open.csdn.net) documentation could not be verified — recommend phase-specific research before implementation.*
 
-### Backend
+## Recommended Stack
 
-| Layer | Technology | Version | Rationale |
-|-------|-----------|---------|-----------|
-| Framework | Spring Boot | 3.2.x | Java 17+ required, native AOT support |
-| Language | Java | 17+ | LTS, Spring Boot 3 requires 17+ |
-| ORM | MyBatis | 3.0.x | SQL explicit, avoids JPA complexity |
-| Database | MySQL | 8.0+ | Local install, utf8mb4 charset |
-| Auth | Spring Security + JWT | — | Stateless JWT, BCrypt password encoding |
-| Migrations | Flyway | 10.x | Version-controlled schema changes |
-| Build | Maven | 3.9+ | Standard Java build tool |
+### Backend Additions
 
-### Frontend
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| Jsoup | 1.18.x | HTML parsing and manipulation | Standard Java HTML parser, CSS selectors for CSDN article extraction, no external dependencies |
+| Spring RestClient | Built-in (Spring Boot 3.2+) | HTTP client for fetching CSDN pages | Replaces RestTemplate; Spring's recommended HTTP client for Spring Boot 3.2+ |
+| Spring Scheduling | Built-in | Timer-based sync scheduling | No new dependency for simple cron-style scheduling |
+| Markdown conversion: html2md or custom | — | Convert CSDN HTML content to Markdown | Lightweight string transformation; can implement inline |
+| Image deduplication: MD5 hash | Built-in (Java stdlib) | Deduplicate images by URL hash | No library needed, use `java.security.MessageDigest` |
 
-| Layer | Technology | Version | Rationale |
-|-------|-----------|---------|-----------|
-| Framework | Vue | 3.4+ | Composition API, `<script setup>` |
-| Build | Vite | 5.x | Fast dev server, HMR |
-| Router | Vue Router | 4.x | SPA routing, history mode |
-| State | Pinia | 2.x | Lightweight, TypeScript support |
-| CSS | Tailwind CSS | 3.4+ | Utility-first, dark mode via `class` strategy |
-| Markdown | markdown-it | 12.x | Plugin ecosystem, syntax highlighting |
-| Code Highlight | highlight.js | 11.x | 190+ languages, auto-detection |
-| HTTP | Axios | 1.x | Interceptors, request/response transforms |
+### Supporting Libraries (Backend)
 
-### Infrastructure
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| Jsoup | 1.18.x | Parse CSDN HTML pages, extract article content, tags, images | Required for article scraping |
+| Caffeine (optional) | 3.1.x | Cache CSDN article list during sync | Only if syncing many articles, reduces CSDN page requests |
 
-| Component | Technology | Notes |
-|-----------|-----------|-------|
-| Image Storage | Local filesystem | `/uploads/{year}/{month}/{uuid}.{ext}` |
-| Static Serving | Spring Boot | Configure `spring.web.resources.static-locations` |
-| Port (backend) | 8080 | Default Spring Boot |
-| Port (frontend) | 5173 | Default Vite dev server |
+### Frontend Additions
+
+| Technology | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| Sync dashboard component | New | Display sync status, last sync time, article counts | Required |
+| Manual sync trigger button | New | One-click sync in admin panel | Required |
+| Sync configuration form | New | Set CSDN userId, target category, schedule toggle | Required |
+
+*Note: Frontend additions are UI components only — no new npm dependencies expected. Reuse existing Axios, Tailwind CSS, Vue patterns.*
+
+## Installation
+
+```bash
+# Backend (Maven pom.xml additions)
+
+# Jsoup for HTML parsing
+<dependency>
+    <groupId>org.jsoup</groupId>
+    <artifactId>jsoup</artifactId>
+    <version>1.18.1</version>
+</dependency>
+
+# Caffeine cache (optional, for article list caching)
+<dependency>
+    <groupId>com.github.ben-manes.caffeine</groupId>
+    <artifactId>caffeine</artifactId>
+</dependency>
+
+# Note: Spring Boot 3.2+ RestClient is built into spring-boot-starter-web
+# No additional HTTP client dependency needed
+
+# Frontend
+# No new npm dependencies expected
+# Components built with existing: Vue 3, Tailwind CSS, Axios
+```
+
+## Alternatives Considered
+
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|-------------------------|
+| Jsoup | Spring WebFlux + Cheerio (Node.js scraper microservice) | If CSDN blocks Java scraping or rate limits heavily |
+| Spring Scheduling (built-in) | Quartz Scheduler | If complex cron expressions or distributed scheduling needed |
+| RestClient (Spring 6/Boot 3.2) | OkHttp + Jsoup HTTP | If fine-grained HTTP control needed beyond RestClient |
+| html2md (library) | Custom regex-based HTML-to-Markdown conversion | If html2md proves incomplete for CSDN HTML |
 
 ## What NOT to Use
 
-| Avoid | Reason |
-|-------|--------|
-| JPA/Hibernate | Overkill for simple blog; MyBatis gives SQL visibility |
-| MySQL `${}` interpolation | SQL injection risk — always use `#{ }` |
-| Base64 images | Database bloat; use file storage |
-| Session-based auth | Stateless REST calls for; JWT is idiomatic |
-| Component library (Element Plus etc.) | Conflicts with custom dark theme; Tailwind only |
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| Jsoup 1.15.x | Version 1.18.x has better HTML5 compliance for modern CSDN pages | Jsoup 1.18.x |
+| `@Scheduled` with blocking I/O on async executor | Blocks Spring's async thread pool | Use `@Async` with dedicated thread pool, or non-blocking WebClient |
+| Base64 image embedding in articles | Bloats article content, breaks local storage constraint | Download images to local filesystem per existing `/uploads/{year}/{month}/{uuid}.{ext}` pattern |
+| Separate Node.js scraper service | Adds deployment complexity, goes against single-backend architecture | Keep scraping in JVM with Jsoup |
+| RestTemplate | Deprecated in Spring 6, replaced by RestClient | RestClient (Spring Boot 3.2+ built-in) |
 
-## Key Libraries
+## Stack Patterns by Variant
 
-```xml
-<!-- Backend (pom.xml) -->
-spring-boot-starter-web
-spring-boot-starter-security
-mybatis-spring-boot-starter
-mysql-connector-j
-flyway-core
-jjwt-api (JWT tokens)
+**If CSDN provides an official Open API (open.csdn.net):**
+- Use official API endpoints (authenticated) instead of HTML scraping
+- Eliminates need for Jsoup HTML parsing
+- Reduces sync complexity and rate limiting concerns
+- Verify API rate limits and OAuth requirements
 
-<!-- Frontend (package.json) -->
-vue@3
-vue-router@4
-pinia
-tailwindcss
-@tailwindcss/typography (Markdown rendering)
-markdown-it
-highlight.js
-axios
-```
+**If CSDN requires HTML scraping (no official API or API insufficient):**
+- Use Jsoup to fetch and parse article pages
+- Target article URL pattern: `https://blog.csdn.net/{userId}/article/details/{articleId}`
+- Extract: article title, content HTML, tags, publish date
+- Convert HTML content to Markdown for storage
+- Download and re-upload images to local storage, replace `src` URLs with local paths
 
-## Version Verification
+## Version Compatibility
 
-All versions verified as current (2026-04) via official documentation and npm/pypi registries.
+| Package A | Compatible With | Notes |
+|-----------|-----------------|-------|
+| Jsoup 1.18.x | Java 17+, Spring Boot 3.x | No known conflicts |
+| Spring Scheduling | Any Spring Boot 3.x | Built-in, no version concerns |
+| RestClient (Spring 6) | Spring Boot 3.2+ | Replaces RestTemplate as recommended client |
+| Caffeine 3.1.x | Java 17+ | Compatible with Spring Boot 3 |
+
+## Integration with Existing Stack
+
+The CSDN sync feature builds on top of the existing v1.0 stack with these additions:
+
+**Existing components reused:**
+- `ArticleService` — for importing parsed articles (create/update)
+- `ImageUploadService` — for storing downloaded images (path pattern already exists)
+- Spring Security — protect sync admin endpoints
+- MyBatis — add new fields (`source`, `csdn_article_id`) to existing article mapper
+- Flyway — new migration for article table columns
+
+**New components:**
+- `CsdnSyncService` — orchestrates fetch, parse, convert, download, import
+- `CsdnConfig` — CSDN userId, target category, schedule settings
+- Spring `@Scheduled` or `TaskScheduler` bean — for automatic sync
+
+**Frontend integration:**
+- New view: `SyncSettingsView.vue` — configuration form
+- Extend `AdminSidebar.vue` — add sync nav item
+- Extend `DashboardView.vue` — show sync status widget
+- Reuse existing Axios patterns for API calls
+
+## Sources
+
+- CSDN Open Platform — **UNVERIFIED** (web search unavailable, open.csdn.net not accessible during research session). Verify official API capabilities before implementation.
+- Jsoup 1.18.x docs — https://jsoup.org/
+- Spring RestClient — https://docs.spring.io/spring-framework/reference/web/webclient-restclient.html
+- Spring Scheduling — https://docs.spring.io/spring-boot/reference/features/scheduling.html
 
 ---
-*Stack research for: Personal Blog — Vue 3 + Spring Boot 3 + MySQL + MyBatis + Tailwind CSS*
-*Researched: 2026/04/13*
+*Stack research for: CSDN article sync additions to existing blog stack*
+*Researched: 2026-04-15*
