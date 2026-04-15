@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-3 (shipped 2026-04-15)
-- 📋 **v1.1** — (planned)
+- 📋 **v1.1** — CSDN 文章同步 (planning)
 
 ## Phases
 
@@ -18,13 +18,69 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 
 </details>
 
+### v1.1: CSDN 文章同步
+
+- [ ] **Phase 4: Core Sync Infrastructure** - Backend service, DB migrations, CSDN article parsing and import
+- [ ] **Phase 5: Image Handling & Sync UI** - Image download/dedupe, admin sync management interface
+
+---
+
+## Phase Details
+
+### Phase 4: Core Sync Infrastructure
+
+**Goal:** Backend can fetch, parse, and import CSDN articles with deduplication
+
+**Depends on:** Phase 3 (v1.0)
+
+**Requirements:** SYNC-01, SYNC-02, SYNC-03, SYNC-04, SYNC-05, SYNC-06, SYNC-07, SYNC-08, SYNC-14, SYNC-15
+
+**Success Criteria** (what must be TRUE):
+1. Admin can configure CSDN userId via backend API and persist to database
+2. Admin can select target category for synced articles via backend API
+3. Admin can trigger manual sync that fetches articles from CSDN and imports them as published posts
+4. Duplicate CSDN articles are detected by csdn_article_id and skipped or updated (not duplicated)
+5. Parsed articles have `source: CSDN` and `csdn_article_id` recorded in database
+6. Flyway V2 migration creates `csdn_sync_config` table
+7. Flyway V3 migration adds `source` and `csdn_article_id` columns to articles table
+
+**Plans:** TBD
+
+**UI hint:** yes
+
+---
+
+### Phase 5: Image Handling & Sync UI
+
+**Goal:** CSDN images are downloaded locally and admin has sync management interface
+
+**Depends on:** Phase 4
+
+**Requirements:** SYNC-09, SYNC-10, SYNC-11, SYNC-12, SYNC-13
+
+**Success Criteria** (what must be TRUE):
+1. CSDN images in article content are downloaded to local filesystem storage
+2. CSDN image URLs in Markdown content are replaced with local storage paths
+3. Images with duplicate URLs (same URL hash/MD5) are not re-downloaded
+4. Admin can view and edit sync configuration (CSDN userId, target category) in backend UI
+5. Admin can click "同步" button to trigger sync and see result counts (success/fail/skip)
+6. Admin receives warning dialog when editing an article that was synced from CSDN
+
+**Plans:** TBD
+
+**UI hint:** yes
+
+---
+
 ## Progress
 
-| Phase | Milestone | Plans | Status | Completed |
-|-------|-----------|-------|--------|-----------|
-| 1. Admin Backend & Dark Theme | v1.0 | 3/3 | ✅ Complete | 2026-04-13 |
-| 2. Public Blog & Image Upload | v1.0 | 3/3 | ✅ Complete | 2026-04-13 |
-| 3. Comments | v1.0 | 3/3 | ✅ Complete | 2026-04-14 |
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Admin Backend & Dark Theme | 3/3 | ✅ Complete | 2026-04-13 |
+| 2. Public Blog & Image Upload | 3/3 | ✅ Complete | 2026-04-13 |
+| 3. Comments | 3/3 | ✅ Complete | 2026-04-14 |
+| 4. Core Sync Infrastructure | 0/N | Not started | - |
+| 5. Image Handling & Sync UI | 0/N | Not started | - |
 
 ---
 _See `.planning/milestones/v1.0-ROADMAP.md` for full v1.0 phase details._

@@ -14,51 +14,44 @@ last_activity: 2026-04-15
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** 快速搭建一个属于自己的技术博客空间，专注于内容创作
-**Current focus:** v1.0 MVP shipped — planning next milestone
+**Current focus:** v1.1 CSDN 文章同步 — roadmap created
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 4 (Core Sync Infrastructure) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-15 — Milestone v1.1 started
+Status: Roadmap defined
+Last activity: 2026-04-15 — v1.1 roadmap created
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v1.0):**
 
 - Total plans completed: 12
 - Average duration: ~5 min/plan
 - Total execution time: ~45 min
 
-**By Phase:**
+**By Phase (v1.0):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Admin Backend & Dark Theme | 3/3 | ~15 min | ~5 min |
 | 2. Public Blog & Image Upload | 3/3 | ~15 min | ~5 min |
-| 3. Comments | 0/3 | - | - |
-| 3 | 3 | - | - |
+| 3. Comments | 3/3 | ~15 min | ~5 min |
 
-**Recent Trend:**
-
-- Plans 02-01, 02-02, 02-03 all completed in ~5 min each
-- Trend: Consistent velocity
-
-*Updated after each plan completion*
+**v1.1:** Not yet started
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Recent decisions affecting v1.1:
 
-- Phase 1: JWT stateless auth with BCrypt password hashing
-- Phase 1: Flyway migrations before any table creation
-- Phase 1: Textarea + preview markdown editor (no rich editor in v1)
-- Phase 2: Local filesystem image storage (not base64)
-- Phase 3: Comments default to PENDING, admin must approve before public
+- v1.1: Jsoup 1.18.x for HTML parsing of CSDN pages
+- v1.1: Spring RestClient (Boot 3.2+) for HTTP fetching
+- v1.1: Image deduplication by URL hash (MD5)
+- v1.1: CSDN images downloaded immediately (no signed URL storage)
 
 ### Pending Todos
 
@@ -66,10 +59,11 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- CSDN Open Platform API unverified — may need to fall back to HTML scraping with Jsoup
+- CSDN HTML selector paths need validation against real CSDN article pages
 
 ## Session Continuity
 
-Last session: 2026-04-13T13:29:00.788Z
-Stopped at: Phase 03 context gathered (auto)
-Resume file: .planning/phases/03-comments/03-CONTEXT.md
+Last session: 2026-04-15T00:00:00.000Z
+Stopped at: v1.0 shipped, v1.1 roadmap defined
+Resume file: .planning/ROADMAP.md
