@@ -4,7 +4,6 @@ import com.blog.dto.ArticleListRequest;
 import com.blog.dto.ArticleListResponse;
 import com.blog.dto.PublicArticleResponse;
 import com.blog.entity.Article;
-import com.blog.entity.Category;
 import com.blog.entity.Tag;
 import com.blog.mapper.ArticleMapper;
 import com.blog.service.PublicArticleService;

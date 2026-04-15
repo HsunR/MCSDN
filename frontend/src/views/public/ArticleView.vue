@@ -1,12 +1,13 @@
 <script setup>
 import { onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import CommentSection from '../../components/CommentSection.vue'
 
 const route = useRoute()
+const router = useRouter()
 const store = usePublicArticleStore()
 
 const md = new MarkdownIt({
@@ -46,6 +47,17 @@ onMounted(() => {
 
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <button
+      @click="router.back()"
+      class="mb-6 flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back
+    </button>
+
     <div v-if="store.loading" class="text-center py-12">
       <p class="text-gray-500">Loading...</p>
     </div>

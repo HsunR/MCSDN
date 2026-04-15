@@ -7,7 +7,7 @@ const commentStore = useCommentStore()
 const activeTab = ref('PENDING')
 const deletingId = ref(null)
 
-const tabs = ['PENDING', 'APPROVED', 'REJECTED']
+const tabs = ['ALL', 'PENDING', 'APPROVED', 'REJECTED']
 
 const comments = computed(() => commentStore.comments)
 const loading = computed(() => commentStore.loading)
@@ -39,7 +39,7 @@ function getStatusBadgeClass(status) {
 
 async function handleTabClick(status) {
   activeTab.value = status
-  await commentStore.fetchAll(status)
+  await commentStore.fetchAll(status === 'ALL' ? null : status)
 }
 
 async function handleApprove(id) {
