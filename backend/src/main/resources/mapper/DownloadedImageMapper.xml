@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.DownloadedImageMapper">
+    <resultMap id="DownloadedImageResultMap" type="com.blog.entity.DownloadedImage">
+        <id property="id" column="id"/>
+        <result property="urlHash" column="url_hash"/>
+        <result property="localPath" column="local_path"/>
+        <result property="originalUrl" column="original_url"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findByUrlHash" resultMap="DownloadedImageResultMap">
+        SELECT * FROM downloaded_images WHERE url_hash = #{urlHash} LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO downloaded_images (url_hash, local_path, original_url)
+        VALUES (#{urlHash}, #{localPath}, #{originalUrl})
+    </insert>
+</mapper>
