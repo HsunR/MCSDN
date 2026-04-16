@@ -1,9 +1,6 @@
 package com.blog.service.impl;
 
 import com.blog.service.CsdnArticleFetcher;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,58 +8,89 @@ import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CsdnArticleFetcherImpl implements CsdnArticleFetcher {
 
     private static final Logger log = LoggerFactory.getLogger(CsdnArticleFetcherImpl.class);
 
-    // Primary and fallback CSS selectors per D-02
-    private static final String PRIMARY_SELECTOR = "div.article-list a.article-title";
-    private static final String FALLBACK_SELECTOR = "div.post-list a.post-title";
-
     private static final RestClient restClient = RestClient.create();
 
     @Override
     public List<String> fetchArticleList(String csdnUserId) {
-        String url = "https://blog.csdn.net/" + csdnUserId + "/article/list/";
-        log.info("Fetching CSDN article list from: {}", url);
-
-        String html = fetchHtml(url);
-        Document doc = Jsoup.parse(html);
+        log.info("Fetching CSDN article list via JSON API for user: {}", csdnUserId);
 
         List<String> articleUrls = new ArrayList<>();
+        int page = 1;
+        int size = 100;
+        int maxPages = 5; // Safety limit: 5 * 100 = 500 articles max
 
-        // Try primary selector first
-        List<Element> links = doc.select(PRIMARY_SELECTOR);
-        if (links.isEmpty()) {
-            log.warn("CSDN primary selector failed, trying fallback: {}", PRIMARY_SELECTOR);
-            links = doc.select(FALLBACK_SELECTOR);
-        }
+        while (page <= maxPages) {
+            String apiUrl = "https://blog.csdn.net/community/home-api/v1/get-business-list"
+                + "?username=" + csdnUserId
+                + "&page=" + page
+                + "&size=" + size
+                + "&businessType=blog"
+                + "&orderby=createtime"
+                + "&noHtml=1";
 
-        for (Element link : links) {
-            String href = link.attr("href");
-            if (href != null && !href.isEmpty()) {
-                articleUrls.add(href);
+            String jsonResponse = restClient
+                .get()
+                .uri(apiUrl)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .header("Accept", "application/json, text/plain, */*")
+                .header("Referer", "https://blog.csdn.net/" + csdnUserId)
+                .retrieve()
+                .body(String.class);
+
+            List<String> urls = parseArticleUrlsFromJson(jsonResponse);
+            if (urls.isEmpty()) {
+                log.warn("No article URLs found on page {}, stopping pagination", page);
+                break;
             }
+            articleUrls.addAll(urls);
+            log.info("Page {}: found {} article URLs", page, urls.size());
+
+            // Check if there are more pages by checking if list size == size
+            if (urls.size() < size) {
+                break; // Last page
+            }
+            page++;
         }
 
-        log.info("Found {} article URLs from CSDN", articleUrls.size());
+        log.info("Total article URLs fetched from CSDN: {}", articleUrls.size());
         return articleUrls;
     }
 
     @Override
     public String fetchArticleHtml(String articleUrl) {
         log.debug("Fetching article HTML from: {}", articleUrl);
-        return fetchHtml(articleUrl);
-    }
-
-    private String fetchHtml(String url) {
         return restClient
             .get()
-            .uri(url)
+            .uri(articleUrl)
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Referer", "https://blog.csdn.net/")
             .retrieve()
             .body(String.class);
+    }
+
+    private List<String> parseArticleUrlsFromJson(String json) {
+        List<String> urls = new ArrayList<>();
+        if (json == null || json.isEmpty()) {
+            return urls;
+        }
+        // Extract "url":"https://blog.csdn.net/..." patterns from JSON
+        Pattern pattern = Pattern.compile("\"url\"\\s*:\\s*\"(https?://[^\"]+)\"");
+        Matcher matcher = pattern.matcher(json);
+        while (matcher.find()) {
+            String url = matcher.group(1);
+            if (url != null && url.contains("blog.csdn.net")) {
+                urls.add(url);
+            }
+        }
+        return urls;
     }
 }
