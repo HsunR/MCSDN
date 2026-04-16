@@ -50,6 +50,12 @@ const routes = [
     component: () => import('../views/admin/TagManagementView.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/admin/csdn-sync',
+    name: 'CsdnSync',
+    component: () => import('../views/admin/CsdnSyncView.vue'),
+    meta: { requiresAuth: true }
+  },
 
   // NEW: Public routes (no auth required per D-03, D-04, D-05, D-06)
   {
