@@ -27,8 +27,8 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO articles (title, content, status, category_id)
-        VALUES (#{title}, #{content}, #{status}, #{categoryId})
+        INSERT INTO articles (title, content, status, category_id, source, csdn_article_id, content_hash)
+        VALUES (#{title}, #{content}, #{status}, #{categoryId}, #{source}, #{csdnArticleId}, #{contentHash})
     </insert>
 
     <update id="update">
