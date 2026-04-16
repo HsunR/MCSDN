@@ -21,6 +21,7 @@ const categories = ref([])
 const tags = ref([])
 const tagInput = ref('')
 const saving = ref(false)
+const showSyncWarning = ref(false)
 
 const http = axios.create({
   baseURL: '/api'
@@ -46,6 +47,10 @@ onMounted(async () => {
       status.value = article.status
       categoryId.value = article.categoryId
       tags.value = article.tags?.map(t => t.name) || []
+    }
+    // D-03: Check if synced article — show blocking warning modal
+    if (article.source === 'CSDN') {
+      showSyncWarning.value = true
     }
   }
 })
@@ -86,6 +91,19 @@ async function handleSave() {
 
 <template>
   <div class="flex min-h-screen bg-gray-900">
+    <!-- D-03: Synced article warning modal — blocks editor access until acknowledged -->
+    <div v-if="showSyncWarning" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md border border-gray-700">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-4">编辑警告</h3>
+        <p class="text-gray-300 mb-6">该文章为同步文章，不建议编辑。更改将在下次同步时被覆盖。</p>
+        <button
+          @click="showSyncWarning = false"
+          class="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg"
+        >
+          我已知悉
+        </button>
+      </div>
+    </div>
     <AdminSidebar />
 
     <main class="flex-1 p-8">
