@@ -3,13 +3,10 @@ package com.blog.service.impl;
 import com.blog.entity.DownloadedImage;
 import com.blog.mapper.DownloadedImageMapper;
 import com.blog.service.ImageDownloadService;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -40,21 +37,10 @@ public class ImageDownloadServiceImpl implements ImageDownloadService {
     @Value("${upload.path:./uploads}")
     private String uploadPath;
 
-    @Autowired
-    private RestClient.Builder restClientBuilder;
+    private static final RestClient restClient = RestClient.create();
 
     @Autowired
     private DownloadedImageMapper downloadedImageMapper;
-
-    private RestClient restClient;
-
-    @PostConstruct
-    public void init() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10_000);
-        factory.setReadTimeout(30_000);
-        this.restClient = restClientBuilder.requestFactory(factory).build();
-    }
 
     @Override
     public String downloadAndReplaceImages(String content) {
