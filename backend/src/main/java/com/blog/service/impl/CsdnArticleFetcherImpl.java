@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -22,8 +21,7 @@ public class CsdnArticleFetcherImpl implements CsdnArticleFetcher {
     private static final String PRIMARY_SELECTOR = "div.article-list a.article-title";
     private static final String FALLBACK_SELECTOR = "div.post-list a.post-title";
 
-    @Autowired
-    private RestClient.Builder restClientBuilder;
+    private static final RestClient restClient = RestClient.create();
 
     @Override
     public List<String> fetchArticleList(String csdnUserId) {
@@ -60,7 +58,7 @@ public class CsdnArticleFetcherImpl implements CsdnArticleFetcher {
     }
 
     private String fetchHtml(String url) {
-        return restClientBuilder.build()
+        return restClient
             .get()
             .uri(url)
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
