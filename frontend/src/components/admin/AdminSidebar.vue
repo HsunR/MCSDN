@@ -73,6 +73,14 @@ function handleLogout() {
       >
         Tags
       </router-link>
+
+      <router-link
+        to="/admin/csdn-sync"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors"
+        :class="route.path.startsWith('/admin/csdn-sync') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
+      >
+        CSDN 同步
+      </router-link>
     </nav>
 
     <div class="p-4 border-t border-gray-800">
