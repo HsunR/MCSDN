@@ -62,7 +62,7 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 
 **Depends on:** Phase 4
 
-**Requirements:** SYNC-09, SYNC-10, SYNC-11, SYNC-12, SYNC-13
+**Requirements:** SYNC-07, SYNC-09, SYNC-10, SYNC-11, SYNC-12, SYNC-13
 
 **Success Criteria** (what must be TRUE):
 1. CSDN images in article content are downloaded to local filesystem storage
@@ -72,12 +72,14 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 5. Admin can click "同步" button to trigger sync and see result counts (success/fail/skip)
 6. Admin receives warning dialog when editing an article that was synced from CSDN
 
-**Plans:** 5 plans
+**Plans:** 7 plans
 - [ ] .planning/phases/05-image-handling-sync-ui/05-01-PLAN.md — Flyway V8 + DownloadedImage entity/mapper + ImageDownloadService (Wave 1)
 - [ ] .planning/phases/05-image-handling-sync-ui/05-02-PLAN.md — Integrate ImageDownloadService into CsdnSyncService (Wave 1)
 - [ ] .planning/phases/05-image-handling-sync-ui/05-03-PLAN.md — CsdnSyncView page + router + sidebar nav (Wave 2)
 - [ ] .planning/phases/05-image-handling-sync-ui/05-04-PLAN.md — ArticleEditorView CSDN warning modal (Wave 2)
-- [x] .planning/phases/05-image-handling-sync-ui/05-05-PLAN.md — Fix RestClient.Builder NPE (Wave 3)
+- [x] .planning/phases/05-image-handling-sync-ui/05-05-PLAN.md — Fix RestClient.Builder NPE in CsdnArticleFetcherImpl (Wave 3)
+- [x] .planning/phases/05-image-handling-sync-ui/05-06-PLAN.md — Fix HTML scraping: use CSDN JSON API (Wave 1)
+- [ ] .planning/phases/05-image-handling-sync-ui/05-07-PLAN.md — Fix RestClient.Builder NPE in ImageDownloadServiceImpl (Wave 1) [GAP CLOSURE]
 
 **UI hint:** yes
 
@@ -90,8 +92,8 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 | 1. Admin Backend & Dark Theme | 3/3 | ✅ Complete | 2026-04-13 |
 | 2. Public Blog & Image Upload | 3/3 | ✅ Complete | 2026-04-13 |
 | 3. Comments | 3/3 | ✅ Complete | 2026-04-14 |
-| 4. Core Sync Infrastructure | 5/5 | ✅ Planned | - |
-| 5. Image Handling & Sync UI | 1/5 | Gap closure | - |
+| 4. Core Sync Infrastructure | 5/5 | ✅ Complete | 2026-04-16 |
+| 5. Image Handling & Sync UI | 2/7 | Gap closure | - |
 
 ---
 _See `.planning/milestones/v1.0-ROADMAP.md` for full v1.0 phase details._
