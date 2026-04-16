@@ -1,5 +1,5 @@
 ---
-status: partial
+status: diagnosed
 phase: 05-image-handling-sync-ui
 source:
   - 05-01-SUMMARY.md
@@ -64,7 +64,13 @@ blocked: 1
   reason: "User reported: 返回200但所有计数都是0: {\"created\":0,\"updated\":0,\"skipped\":0,\"errors\":[]} 无法正常同步"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "CsdnArticleFetcherImpl uses @Autowired RestClient.Builder but no RestClient.Builder bean is defined in Spring context. restClientBuilder is null, causing NPE on every fetchHtml() call. All article fetches fail silently in the continue-on-error loop, resulting in empty article list and all-zero counts."
+  artifacts:
+    - path: "backend/src/main/java/com/blog/service/impl/CsdnArticleFetcherImpl.java"
+      issue: "RestClient.Builder restClientBuilder is null — no such bean exists"
+    - path: "backend/src/main/java/com/blog/config/WebConfig.java"
+      issue: "Missing RestClient.Builder bean definition"
+  missing:
+    - "Add RestClient.Builder bean to Spring config (WebConfig or RestClientConfig)"
+    - "OR change CsdnArticleFetcherImpl to use RestClient.create() instead of injection"
+  debug_session: ".planning/debug/csdn-sync-returns-all-zeros.md"
