@@ -1,10 +1,11 @@
 ---
 phase: 05
 slug: image-handling-sync-ui
-status: draft
+status: audit_complete
 nyquist_compliant: false
 wave_0_complete: false
 created: 2026-04-16
+last_audited: 2026-04-16
 ---
 
 # Phase 05 — Validation Strategy
@@ -78,5 +79,24 @@ created: 2026-04-16
 - [ ] All success criteria have test instructions above
 - [ ] `nyquist_compliant: false` — no automated test framework in project
 - [ ] Approval: pending manual verification
+
+## Validation Audit 2026-04-16
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 5 |
+| Resolved | 0 |
+| Escalated | 5 (all manual-only) |
+
+> No test framework exists in this project. All verification is manual. No automated tests can be added without significant scaffolding effort not scoped for this project.
+
+### Escalated to Manual-Only
+
+| Task ID | Requirement | Behavior |
+|---------|-------------|----------|
+| 05-01 | SYNC-09 | MD5 URL dedup skips already-downloaded images |
+| 05-02 | SYNC-07, SYNC-09 | Image URL replacement during sync (continue-on-error) |
+| 05-03 | SYNC-10, SYNC-11, SYNC-12 | Config form, sync button, results panel |
+| 05-04 | SYNC-13 | Blocking modal for CSDN-synced articles |
 
 **Approval:** pending
