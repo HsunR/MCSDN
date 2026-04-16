@@ -72,7 +72,11 @@ _Archived:_ `.planning/milestones/v1.0-ROADMAP.md`
 5. Admin can click "同步" button to trigger sync and see result counts (success/fail/skip)
 6. Admin receives warning dialog when editing an article that was synced from CSDN
 
-**Plans:** TBD
+**Plans:** 4 plans
+- [ ] .planning/phases/05-image-handling-sync-ui/05-01-PLAN.md — Flyway V8 + DownloadedImage entity/mapper + ImageDownloadService (Wave 1)
+- [ ] .planning/phases/05-image-handling-sync-ui/05-02-PLAN.md — Integrate ImageDownloadService into CsdnSyncService (Wave 1)
+- [ ] .planning/phases/05-image-handling-sync-ui/05-03-PLAN.md — CsdnSyncView page + router + sidebar nav (Wave 2)
+- [ ] .planning/phases/05-image-handling-sync-ui/05-04-PLAN.md — ArticleEditorView CSDN warning modal (Wave 2)
 
 **UI hint:** yes
 
