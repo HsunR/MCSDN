@@ -9,6 +9,7 @@ import com.blog.service.CsdnArticleFetcher;
 import com.blog.service.CsdnArticleParser;
 import com.blog.service.CsdnSyncConfigService;
 import com.blog.service.CsdnSyncService;
+import com.blog.service.ImageDownloadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private ImageDownloadService imageDownloadService;
+
     @Override
     @Transactional
     public SyncResultResponse syncArticles() {
@@ -70,6 +74,15 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
                 // Fetch and parse article
                 String html = csdnArticleFetcher.fetchArticleHtml(articleUrl);
                 CsdnArticleDto articleDto = csdnArticleParser.parseArticle(html, articleUrl);
+
+                // Replace CSDN image URLs with local paths (SYNC-07, SYNC-09)
+                try {
+                    String contentWithLocalImages = imageDownloadService.downloadAndReplaceImages(articleDto.getContent());
+                    articleDto.setContent(contentWithLocalImages);
+                } catch (Exception e) {
+                    // Image download failed — continue with original content per continue-on-error pattern
+                    log.warn("Image download failed for article {}: {}", articleUrl, e.getMessage());
+                }
 
                 // Compute content hash for update detection per D-03
                 String contentHash = computeMd5Hash(articleDto.getContent());
