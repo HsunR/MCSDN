@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -87,7 +88,11 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
                 }
             }
             case "pre" -> {
-                out.append("```\n").append(el.text()).append("\n```\n\n");
+                // Try to extract language from class (e.g., "language-python hljs")
+                String lang = extractLanguage(el);
+                // Try to extract code content handling line numbers
+                String code = extractPreCode(el);
+                out.append("```").append(lang).append("\n").append(code).append("\n```\n\n");
             }
             case "blockquote" -> {
                 out.append("> ").append(el.text().replace("\n", "\n> ")).append("\n\n");
@@ -98,9 +103,18 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
                 out.append("[").append(text).append("](").append(href).append(")");
             }
             case "img" -> {
+                // Handle lazy-loaded images: CSDN uses data-src for lazy loading
                 String src = el.attr("src");
+                String dataSrc = el.attr("data-src");
+                // Use data-src if src is empty, placeholder, or a tracking pixel
+                if ((src == null || src.isEmpty() || isPlaceholderSrc(src)) && dataSrc != null && !dataSrc.isEmpty()) {
+                    src = dataSrc;
+                }
                 String alt = el.attr("alt");
-                out.append("![").append(alt != null ? alt : "").append("](").append(src).append(")");
+                if (alt == null || alt.isEmpty()) {
+                    alt = el.attr("title");
+                }
+                out.append("![").append(alt != null ? alt : "").append("](").append(src != null ? src : "").append(")");
             }
             case "ul" -> {
                 for (Element li : el.select("> li")) {
@@ -130,6 +144,75 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
 
     private String processInline(String text) {
         return text;
+    }
+
+    /**
+     * Extract language from pre/code element class attributes.
+     * CSDN uses: class="language-python hljs" or class="set-code-height hljs"
+     */
+    private String extractLanguage(Element pre) {
+        // Check pre element first
+        String cls = pre.className();
+        String lang = extractLangFromClass(cls);
+        if (!lang.isEmpty()) return lang;
+
+        // Check code child element
+        Element codeEl = pre.selectFirst("code");
+        if (codeEl != null) {
+            cls = codeEl.className();
+            lang = extractLangFromClass(cls);
+        }
+        return lang;
+    }
+
+    private String extractLangFromClass(String className) {
+        if (className == null) return "";
+        // Match "language-xxx" pattern
+        for (String part : className.split("\\s+")) {
+            if (part.startsWith("language-")) {
+                return part.substring("language-".length());
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Extract code content from pre element, handling CSDN's complex nested structure.
+     * CSDN wraps code in: pre > code > ol.hljs-ln > li.hljs-ln-line > div.hljs-ln-code > div.hljs-ln-line
+     * Also handles: pre > code directly with text()
+     */
+    private String extractPreCode(Element pre) {
+        StringBuilder code = new StringBuilder();
+        Element codeEl = pre.selectFirst("code");
+        if (codeEl == null) {
+            return pre.text();
+        }
+
+        // Check for CSDN line number structure: div.hljs-ln-numbers > div.hljs-ln-line
+        // Code content lives in div.hljs-ln-code > div.hljs-ln-line
+        List<Element> lines = codeEl.select("div.hljs-ln-code > div.hljs-ln-line");
+        if (!lines.isEmpty()) {
+            for (Element line : lines) {
+                code.append(line.text()).append("\n");
+            }
+            return code.toString().trim();
+        }
+
+        // Fallback: try direct li selection for other line-numbered formats
+        lines = codeEl.select("li.hljs-ln-line");
+        if (!lines.isEmpty()) {
+            for (Element line : lines) {
+                // Get direct text content, skipping line number divs
+                String text = line.selectFirst("div.hljs-ln-code") != null
+                    ? line.selectFirst("div.hljs-ln-code").text()
+                    : line.text();
+                code.append(text).append("\n");
+            }
+            return code.toString().trim();
+        }
+
+        // Simple case: just code element text
+        return codeEl.text().trim();
     }
 
     private String replaceCsdnImageUrls(String markdown) {
@@ -176,5 +259,20 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
         } catch (NoSuchAlgorithmException e) {
             return "/uploads/csdn/" + url.hashCode() + ".jpg";
         }
+    }
+
+    /**
+     * Check if src is a placeholder/tracking pixel that should be ignored.
+     */
+    private boolean isPlaceholderSrc(String src) {
+        if (src == null || src.isEmpty()) return true;
+        // CSDN tracking pixels and placeholder images
+        String lower = src.toLowerCase();
+        return lower.contains("loading") ||
+               lower.contains("placeholder") ||
+               lower.contains("blank.gif") ||
+               lower.contains("data:image") ||
+               lower.contains("1.png") ||  // kunyu.csdn.net/1.png ads
+               lower.contains("avatar.csdnimg.cn/default");
     }
 }

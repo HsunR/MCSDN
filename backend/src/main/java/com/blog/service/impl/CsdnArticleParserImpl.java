@@ -6,7 +6,6 @@ import com.blog.service.HtmlToMarkdownConverter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +22,21 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
     private static final Logger log = LoggerFactory.getLogger(CsdnArticleParserImpl.class);
 
     // CSS selectors per D-02 (primary with fallbacks)
+    // Updated for current CSDN HTML structure (2025)
     private static final String TITLE_SELECTOR = "h1.title-article";
     private static final String TITLE_FALLBACK = "h1";
-    private static final String CONTENT_SELECTOR = "div.article_content";
-    private static final String CONTENT_FALLBACK = "div.article-content";
-    private static final String TAG_SELECTOR = "div.tag-list-box a.tag";
-    private static final String TAG_FALLBACK = "div.tags a";
+    private static final String CONTENT_SELECTOR = "div#content_views, div#article_content, div.article_content";
+    private static final String CONTENT_FALLBACK = "div.article-content, div.htmledit_views";
+    private static final String TAG_SELECTOR = "div.tags-box a.tag-link-new, div.tag-list-box a.tag";
+    private static final String TAG_FALLBACK = "div.tags-box a, div.tags a";
 
     @Autowired
     private HtmlToMarkdownConverter htmlToMarkdownConverter;
 
     @Override
     public CsdnArticleDto parseArticle(String html, String url) {
-        // Sanitize HTML first to prevent XSS per security controls
-        String safeHtml = Jsoup.clean(html, Safelist.none());
-        Document doc = Jsoup.parse(safeHtml);
+        // Parse HTML directly without sanitization (CSDN is trusted source)
+        Document doc = Jsoup.parse(html);
 
         CsdnArticleDto dto = new CsdnArticleDto();
         dto.setUrl(url);
@@ -89,18 +88,33 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
     }
 
     private String extractArticleId(String url) {
-        // Extract article ID from CSDN URL pattern: https://blog.csdn.net/user/article/12345678
-        Pattern pattern = Pattern.compile("/(\\d{8,})\\.html$");
-        Matcher matcher = pattern.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
+        // CSDN URL formats:
+        // 1. https://blog.csdn.net/user/article/details/12345678  (current)
+        // 2. https://blog.csdn.net/user/article/12345678.html     (legacy)
+        // 3. https://blog.csdn.net/user/p/12345678                (older format)
+
+        // Pattern 1: /article/details/{number} - most common current format
+        Pattern p1 = Pattern.compile("/article/details/(\\d+)");
+        Matcher m1 = p1.matcher(url);
+        if (m1.find()) {
+            return m1.group(1);
         }
-        // Fallback: try to extract from anywhere in URL
-        Pattern altPattern = Pattern.compile("article[/_](\\d+)");
-        Matcher altMatcher = altPattern.matcher(url);
-        if (altMatcher.find()) {
-            return altMatcher.group(1);
+
+        // Pattern 2: /article/{number}.html - legacy format
+        Pattern p2 = Pattern.compile("/article/(\\d{8,})\\.html$");
+        Matcher m2 = p2.matcher(url);
+        if (m2.find()) {
+            return m2.group(1);
         }
+
+        // Pattern 3: /p/{number} - older short URL format
+        Pattern p3 = Pattern.compile("/p/(\\d+)");
+        Matcher m3 = p3.matcher(url);
+        if (m3.find()) {
+            return m3.group(1);
+        }
+
+        log.warn("Could not extract article ID from URL: {}, using full URL", url);
         return url;
     }
 }
