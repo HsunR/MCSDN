@@ -26,7 +26,7 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
     private static final String TITLE_SELECTOR = "h1.title-article";
     private static final String TITLE_FALLBACK = "h1";
     private static final String CONTENT_SELECTOR = "div#content_views, div#article_content, div.article_content";
-    private static final String CONTENT_FALLBACK = "div.article-content, div.htmledit_views";
+    private static final String CONTENT_FALLBACK = "div.htmledit_views";
     private static final String TAG_SELECTOR = "div.tags-box a.tag-link-new, div.tag-list-box a.tag";
     private static final String TAG_FALLBACK = "div.tags-box a, div.tags a";
 
@@ -55,8 +55,11 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
             contentEl = doc.selectFirst(CONTENT_FALLBACK);
         }
         if (contentEl != null) {
-            String markdown = htmlToMarkdownConverter.convert(contentEl.html());
+            String contentHtml = contentEl.html();
+            log.debug("Content HTML preview (first 300 chars): {}", contentHtml.substring(0, Math.min(300, contentHtml.length())).replace("\n", " "));
+            String markdown = htmlToMarkdownConverter.convert(contentHtml);
             dto.setContent(markdown);
+            log.debug("Converted markdown preview (first 200 chars): {}", markdown.substring(0, Math.min(200, markdown.length())));
         } else {
             dto.setContent("");
             log.warn("Could not find content element for article: {}", url);

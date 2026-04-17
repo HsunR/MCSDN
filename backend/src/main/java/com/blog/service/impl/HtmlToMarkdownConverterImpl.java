@@ -39,9 +39,13 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
         }
 
         Document doc = Jsoup.parseBodyFragment(html);
+        log.debug("convert() parsing HTML fragment, body has {} children", doc.body().childNodes().size());
         StringBuilder markdown = new StringBuilder();
 
         for (Node node : doc.body().childNodes()) {
+            if (node instanceof Element el) {
+                log.debug("  child element: tag={}, class={}", el.tagName(), el.className());
+            }
             processNode(node, markdown, 0);
         }
 
@@ -74,7 +78,9 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
             case "h5" -> out.append("##### ").append(el.text()).append("\n\n");
             case "h6" -> out.append("###### ").append(el.text()).append("\n\n");
             case "p" -> {
-                out.append(processInline(el.text()));
+                for (Node child : el.childNodes()) {
+                    processNode(child, out, 0);
+                }
                 out.append("\n\n");
             }
             case "br" -> out.append("\n");
@@ -114,7 +120,9 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
                 if (alt == null || alt.isEmpty()) {
                     alt = el.attr("title");
                 }
-                out.append("![").append(alt != null ? alt : "").append("](").append(src != null ? src : "").append(")");
+                if (src != null && !src.isEmpty() && !isPlaceholderSrc(src)) {
+                    out.append("![").append(alt != null ? alt : "").append("](").append(src).append(")");
+                }
             }
             case "ul" -> {
                 for (Element li : el.select("> li")) {
@@ -266,13 +274,12 @@ public class HtmlToMarkdownConverterImpl implements HtmlToMarkdownConverter {
      */
     private boolean isPlaceholderSrc(String src) {
         if (src == null || src.isEmpty()) return true;
-        // CSDN tracking pixels and placeholder images
         String lower = src.toLowerCase();
         return lower.contains("loading") ||
                lower.contains("placeholder") ||
                lower.contains("blank.gif") ||
                lower.contains("data:image") ||
-               lower.contains("1.png") ||  // kunyu.csdn.net/1.png ads
+               lower.contains("1.png") ||   // kunyu.csdn.net ads
                lower.contains("avatar.csdnimg.cn/default");
     }
 }
