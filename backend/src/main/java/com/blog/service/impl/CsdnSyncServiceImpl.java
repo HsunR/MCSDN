@@ -100,6 +100,11 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
                     article.setSource(SOURCE_CSDN);
                     article.setCsdnArticleId(articleDto.getArticleId());
                     article.setContentHash(contentHash);
+                    // Set timestamps from CSDN published date, fallback to now
+                    LocalDateTime publishedAt = articleDto.getPublishedAt();
+                    LocalDateTime now = LocalDateTime.now();
+                    article.setCreatedAt(publishedAt != null ? publishedAt : now);
+                    article.setUpdatedAt(publishedAt != null ? publishedAt : now);
                     articleMapper.insert(article);
                     created++;
                     log.debug("Created article: {} ({})", articleDto.getTitle(), articleDto.getArticleId());
@@ -107,7 +112,8 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
                     // Check if content changed using hash per D-03
                     if (existing.getContentHash() != null && !existing.getContentHash().equals(contentHash)) {
                         // Content changed - update
-                        articleMapper.updateContentAndHash(existing.getId(), articleDto.getContent(), contentHash);
+                        LocalDateTime updatedAt = articleDto.getPublishedAt() != null ? articleDto.getPublishedAt() : LocalDateTime.now();
+                        articleMapper.updateContentAndHash(existing.getId(), articleDto.getContent(), contentHash, updatedAt);
                         updated++;
                         log.debug("Updated article: {} ({})", articleDto.getTitle(), articleDto.getArticleId());
                     } else {

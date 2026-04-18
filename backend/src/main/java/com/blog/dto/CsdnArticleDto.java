@@ -1,5 +1,6 @@
 package com.blog.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class CsdnArticleDto {
@@ -8,6 +9,7 @@ public class CsdnArticleDto {
     private String content;
     private List<String> tags;
     private String url;
+    private LocalDateTime publishedAt;
 
     public String getArticleId() { return articleId; }
     public void setArticleId(String articleId) { this.articleId = articleId; }
@@ -19,4 +21,6 @@ public class CsdnArticleDto {
     public void setTags(List<String> tags) { this.tags = tags; }
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }
+    public LocalDateTime getPublishedAt() { return publishedAt; }
+    public void setPublishedAt(LocalDateTime publishedAt) { this.publishedAt = publishedAt; }
 }

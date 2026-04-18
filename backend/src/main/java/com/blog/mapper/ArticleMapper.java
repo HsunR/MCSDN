@@ -28,5 +28,5 @@ public interface ArticleMapper {
     List<Article> searchPublishedPaginated(@Param("keyword") String keyword, @Param("limit") int limit, @Param("offset") int offset);
     int countSearchPublished(@Param("keyword") String keyword);
     Article findByCsdnArticleId(@Param("csdnArticleId") String csdnArticleId);
-    int updateContentAndHash(@Param("id") Long id, @Param("content") String content, @Param("contentHash") String contentHash);
+    int updateContentAndHash(@Param("id") Long id, @Param("content") String content, @Param("contentHash") String contentHash, @Param("updatedAt") java.time.LocalDateTime updatedAt);
 }

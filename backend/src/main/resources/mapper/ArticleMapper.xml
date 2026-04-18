@@ -27,8 +27,8 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO articles (title, content, status, category_id, source, csdn_article_id, content_hash)
-        VALUES (#{title}, #{content}, #{status}, #{categoryId}, #{source}, #{csdnArticleId}, #{contentHash})
+        INSERT INTO articles (title, content, status, category_id, source, csdn_article_id, content_hash, created_at, updated_at)
+        VALUES (#{title}, #{content}, #{status}, #{categoryId}, #{source}, #{csdnArticleId}, #{contentHash}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="update">
@@ -167,7 +167,7 @@
         UPDATE articles
         SET content = #{content},
             content_hash = #{contentHash},
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
 </mapper>

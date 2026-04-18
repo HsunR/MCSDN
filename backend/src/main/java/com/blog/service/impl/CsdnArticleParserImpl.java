@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -29,6 +32,10 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
     private static final String CONTENT_FALLBACK = "div.htmledit_views";
     private static final String TAG_SELECTOR = "div.tags-box a.tag-link-new, div.tag-list-box a.tag";
     private static final String TAG_FALLBACK = "div.tags-box a, div.tags a";
+    private static final String PUBLISHED_DATE_SELECTOR = "span.time";
+    private static final DateTimeFormatter CSDN_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final Pattern CSDN_DATE_TEXT_PATTERN = Pattern.compile(
+            "(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})");
 
     @Autowired
     private HtmlToMarkdownConverter htmlToMarkdownConverter;
@@ -86,8 +93,36 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
         }
         dto.setTags(tags);
 
-        log.debug("Parsed article: title={}, tags={}, articleId={}", dto.getTitle(), dto.getTags(), dto.getArticleId());
+        // Extract published date from span.time (handles multiple CSDN formats)
+        Element timeEl = doc.selectFirst(PUBLISHED_DATE_SELECTOR);
+        if (timeEl != null) {
+            // Try data-time attribute first (newer CSDN format: <span class="time blog-postTime" data-time="2025-10-20 13:08:33">)
+            String dateStr = timeEl.attr("data-time");
+            if (dateStr == null || dateStr.isEmpty()) {
+                // Fall back to text content (older format: "于 2025-10-20 13:08:33 发布" or "已于 2024-01-08 15:50:24 修改")
+                String timeText = timeEl.text();
+                dateStr = extractDateFromTimeText(timeText);
+            }
+            if (dateStr != null && !dateStr.isEmpty()) {
+                try {
+                    dto.setPublishedAt(LocalDateTime.parse(dateStr, CSDN_DATE_FORMATTER));
+                } catch (DateTimeParseException e) {
+                    log.warn("Failed to parse date '{}' from article: {}", dateStr, url);
+                }
+            }
+        }
+
+        log.debug("Parsed article: title={}, tags={}, articleId={}, publishedAt={}", dto.getTitle(), dto.getTags(), dto.getArticleId(), dto.getPublishedAt());
         return dto;
+    }
+
+    private String extractDateFromTimeText(String timeText) {
+        // Matches both "于 2025-10-20 13:08:33 发布" and "已于 2024-01-08 15:50:24 修改"
+        Matcher m = CSDN_DATE_TEXT_PATTERN.matcher(timeText);
+        if (m.find()) {
+            return m.group(1).trim();
+        }
+        return null;
     }
 
     private String extractArticleId(String url) {
