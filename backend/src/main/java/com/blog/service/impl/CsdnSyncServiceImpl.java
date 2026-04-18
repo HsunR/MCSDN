@@ -4,7 +4,9 @@ import com.blog.dto.CsdnArticleDto;
 import com.blog.dto.SyncResultResponse;
 import com.blog.entity.Article;
 import com.blog.entity.CsdnSyncConfig;
+import com.blog.entity.Tag;
 import com.blog.mapper.ArticleMapper;
+import com.blog.mapper.TagMapper;
 import com.blog.service.CsdnArticleFetcher;
 import com.blog.service.CsdnArticleParser;
 import com.blog.service.CsdnSyncConfigService;
@@ -41,6 +43,9 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
 
     @Autowired
     private ArticleMapper articleMapper;
+
+    @Autowired
+    private TagMapper tagMapper;
 
     @Autowired
     private ImageDownloadService imageDownloadService;
@@ -106,6 +111,7 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
                     article.setCreatedAt(publishedAt != null ? publishedAt : now);
                     article.setUpdatedAt(publishedAt != null ? publishedAt : now);
                     articleMapper.insert(article);
+                    syncArticleTags(article.getId(), articleDto.getTags());
                     created++;
                     log.debug("Created article: {} ({})", articleDto.getTitle(), articleDto.getArticleId());
                 } else {
@@ -114,6 +120,7 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
                         // Content changed - update
                         LocalDateTime updatedAt = articleDto.getPublishedAt() != null ? articleDto.getPublishedAt() : LocalDateTime.now();
                         articleMapper.updateContentAndHash(existing.getId(), articleDto.getContent(), contentHash, updatedAt);
+                        syncArticleTags(existing.getId(), articleDto.getTags());
                         updated++;
                         log.debug("Updated article: {} ({})", articleDto.getTitle(), articleDto.getArticleId());
                     } else {
@@ -149,6 +156,27 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
             return HexFormat.of().formatHex(digest);
         } catch (Exception e) {
             throw new RuntimeException("Failed to compute MD5 hash", e);
+        }
+    }
+
+    /**
+     * Syncs tags for an article: creates missing tags and updates article_tags relationships.
+     */
+    private void syncArticleTags(Long articleId, List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return;
+        }
+        // Delete existing tag associations
+        articleMapper.deleteArticleTags(articleId);
+        // Create or find tags and associate
+        for (String tagName : tagNames) {
+            Tag tag = tagMapper.findByName(tagName);
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(tagName);
+                tagMapper.insert(tag);
+            }
+            articleMapper.insertArticleTag(articleId, tag.getId());
         }
     }
 }

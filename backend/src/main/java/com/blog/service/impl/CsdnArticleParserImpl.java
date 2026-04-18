@@ -87,7 +87,13 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
             for (Element tag : tagElements) {
                 String tagText = tag.text().trim();
                 if (!tagText.isEmpty()) {
-                    tags.add(tagText);
+                    // Remove leading # if present
+                    if (tagText.startsWith("#")) {
+                        tagText = tagText.substring(1);
+                    }
+                    if (!tagText.isEmpty()) {
+                        tags.add(tagText);
+                    }
                 }
             }
         }

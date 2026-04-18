@@ -1,0 +1,2 @@
+ALTER TABLE categories DROP COLUMN slug;
+ALTER TABLE tags DROP COLUMN slug;

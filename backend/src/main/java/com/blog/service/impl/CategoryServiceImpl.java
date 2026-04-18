@@ -4,7 +4,6 @@ import com.blog.entity.Category;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.CategoryService;
-import com.blog.util.SlugUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +56,6 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         existing.setName(name);
-        existing.setSlug(SlugUtils.slugify(name));
         categoryMapper.update(existing);
         return existing;
     }

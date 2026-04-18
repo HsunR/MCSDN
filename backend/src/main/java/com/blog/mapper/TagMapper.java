@@ -15,5 +15,4 @@ public interface TagMapper {
     int insert(Tag tag);
     int delete(@Param("id") Long id);
     List<Tag> findTagsByNames(@Param("names") List<String> names);
-    Tag findBySlug(@Param("slug") String slug);
 }
