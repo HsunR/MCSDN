@@ -10,6 +10,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['preview'])
+
 // D-01: Group articles by date string
 const groupedByDate = computed(() => {
   const groups = {}
@@ -39,6 +41,7 @@ const groupedByDate = computed(() => {
           v-for="article in articles"
           :key="article.id"
           :article="article"
+          @preview="(id) => emit('preview', id)"
         />
       </div>
     </div>
