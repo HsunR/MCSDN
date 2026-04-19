@@ -1,8 +1,9 @@
 <script setup>
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import ArticleTimeline from '../../components/public/ArticleTimeline.vue'
+import ArticlePreviewModal from '../../components/public/ArticlePreviewModal.vue'
 import Pagination from '../../components/public/Pagination.vue'
 import SearchBar from '../../components/public/SearchBar.vue'
 import CategoryList from '../../components/public/CategoryList.vue'
@@ -10,6 +11,15 @@ import TagCloud from '../../components/public/TagCloud.vue'
 
 const store = usePublicArticleStore()
 const route = useRoute()
+const previewArticleId = ref(null)
+
+function handlePreview(articleId) {
+  previewArticleId.value = articleId
+}
+
+function handleClosePreview() {
+  previewArticleId.value = null
+}
 
 onMounted(() => {
   store.fetchArticles(route.query.page ? parseInt(route.query.page) : 1)
@@ -42,7 +52,7 @@ watch(() => route.query.page, (newPage) => {
           <p class="text-red-500">{{ store.error }}</p>
         </div>
         <div v-else>
-          <ArticleTimeline :articles="store.articles" />
+          <ArticleTimeline :articles="store.articles" @preview="handlePreview" />
           <Pagination
             :current-page="store.currentPage"
             :total-pages="store.totalPages"
@@ -57,4 +67,10 @@ watch(() => route.query.page, (newPage) => {
       </aside>
     </div>
   </div>
+
+  <ArticlePreviewModal
+    :visible="previewArticleId !== null"
+    :articleId="previewArticleId"
+    @close="handleClosePreview"
+  />
 </template>
