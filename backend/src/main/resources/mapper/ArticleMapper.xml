@@ -14,10 +14,12 @@
         <result property="contentHash" column="content_hash"/>
     </resultMap>
 
-    <select id="findAll" resultMap="ArticleResultMap">
-        SELECT id, title, status, category_id, created_at, updated_at
-        FROM articles
-        ORDER BY created_at DESC
+    <select id="findAll" resultMap="ArticleWithCategoryResultMap">
+        SELECT a.id, a.title, a.status, a.category_id, a.created_at, a.updated_at,
+               c.name as category_name, c.id as cat_id
+        FROM articles a
+        LEFT JOIN categories c ON a.category_id = c.id
+        ORDER BY a.created_at DESC
     </select>
 
     <select id="findById" resultMap="ArticleResultMap">

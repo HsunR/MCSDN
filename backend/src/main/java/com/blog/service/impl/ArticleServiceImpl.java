@@ -23,7 +23,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<Article> getAllArticles() {
-        return articleMapper.findAll();
+        List<Article> articles = articleMapper.findAll();
+        for (Article article : articles) {
+            article.setTags(articleMapper.findTagsByArticleId(article.getId()));
+        }
+        return articles;
     }
 
     @Override

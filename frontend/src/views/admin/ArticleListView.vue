@@ -184,6 +184,18 @@ function clearFilters() {
                 <span class="text-gray-500 text-sm">
                   {{ new Date(article.createdAt).toLocaleDateString() }}
                 </span>
+                <span v-if="article.category" class="bg-blue-900 text-blue-300 px-2 py-1 text-xs rounded">
+                  {{ article.category.name }}
+                </span>
+                <span v-if="article.tags && article.tags.length > 0" class="flex gap-1">
+                  <span
+                    v-for="tag in article.tags"
+                    :key="tag.id"
+                    class="bg-purple-900 text-purple-300 px-2 py-1 text-xs rounded"
+                  >
+                    {{ tag.name }}
+                  </span>
+                </span>
               </div>
             </div>
             <div class="flex gap-2">
