@@ -64,8 +64,14 @@ watch(() => props.articleId, (newId) => {
 }, { immediate: true })
 
 // Escape key listener
-onMounted(() => document.addEventListener('keydown', handleEscape))
-onUnmounted(() => document.removeEventListener('keydown', handleEscape))
+onMounted(() => {
+  document.addEventListener('keydown', handleEscape)
+  document.body.style.overflow = 'hidden'
+})
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscape)
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
