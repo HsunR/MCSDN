@@ -19,7 +19,9 @@ function formatDate(dateStr) {
     <h3 class="text-xl font-semibold text-gray-100 flex items-center gap-2">
       <!-- Preview button -->
       <button
-        @click.stop="$emit('preview', article.id)"
+        type="button"
+        @click.stop.prevent="$emit('preview', article.id)"
+        @mousedown.prevent
         class="p-1.5 rounded hover:bg-gray-700 text-gray-400 hover:text-blue-400 transition-colors flex-shrink-0"
         title="快速预览"
       >

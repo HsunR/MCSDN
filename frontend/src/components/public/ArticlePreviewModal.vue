@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch, onMounted, onUnmounted } from 'vue'
+import { computed, watch, onMounted, onUnmounted, ref } from 'vue'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
@@ -11,6 +11,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const store = usePublicArticleStore()
+const scrollPosition = ref(0)
 
 // Reuse ArticleView.vue markdown-it config
 const md = new MarkdownIt({
@@ -49,6 +50,21 @@ function formatDate(dateStr) {
 function handleClose() {
   emit('close')
 }
+
+// Save and restore scroll position when modal opens/closes
+watch(() => props.visible, (isVisible) => {
+  if (isVisible) {
+    scrollPosition.value = window.pageYOffset || document.documentElement.scrollTop
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollPosition.value}px`
+    document.body.style.width = '100%'
+  } else {
+    document.body.style.position = ''
+    document.body.style.top = ''
+    document.body.style.width = ''
+    window.scrollTo(0, scrollPosition.value)
+  }
+})
 
 function handleEscape(e) {
   if (e.key === 'Escape' && props.visible) {
@@ -104,7 +120,9 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape))
         </div>
         <!-- Close Button -->
         <button
-          @click="handleClose"
+          type="button"
+          @click.stop="handleClose"
+          @mousedown.prevent
           class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
           title="关闭预览"
         >
