@@ -29,12 +29,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PREV-01 | Phase 1 | Pending |
-| PREV-02 | Phase 1 | Pending |
-| PREV-03 | Phase 1 | Pending |
-| PREV-04 | Phase 1 | Pending |
-| PREV-05 | Phase 1 | Pending |
-| PREV-06 | Phase 1 | Pending |
+| PREV-01 | Phase 6 | Pending |
+| PREV-02 | Phase 6 | Pending |
+| PREV-03 | Phase 6 | Pending |
+| PREV-04 | Phase 6 | Pending |
+| PREV-05 | Phase 6 | Pending |
+| PREV-06 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 6 total
@@ -43,4 +43,4 @@
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 after initial definition*
+*Last updated: 2026-04-19 after roadmap creation (Phase 6)*
