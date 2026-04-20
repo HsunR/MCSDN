@@ -72,28 +72,18 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
             log.warn("Could not find content element for article: {}", url);
         }
 
-        // Extract tags
+        // Extract tags - select ALL tag-link-new and tag elements regardless of container
         List<String> tags = new ArrayList<>();
-        Element tagContainer = doc.selectFirst(TAG_SELECTOR);
-        if (tagContainer == null) {
-            tagContainer = doc.selectFirst(TAG_FALLBACK);
-        }
-        if (tagContainer != null) {
-            // Select all tag links from within the container
-            List<Element> tagElements = tagContainer.select("a.tag");
-            if (tagElements.isEmpty()) {
-                tagElements = tagContainer.select("a");
-            }
-            for (Element tag : tagElements) {
-                String tagText = tag.text().trim();
+        List<Element> tagElements = doc.select("a.tag-link-new, a.tag");
+        for (Element tag : tagElements) {
+            String tagText = tag.text().trim();
+            if (!tagText.isEmpty()) {
+                // Remove leading # if present
+                if (tagText.startsWith("#")) {
+                    tagText = tagText.substring(1);
+                }
                 if (!tagText.isEmpty()) {
-                    // Remove leading # if present
-                    if (tagText.startsWith("#")) {
-                        tagText = tagText.substring(1);
-                    }
-                    if (!tagText.isEmpty()) {
-                        tags.add(tagText);
-                    }
+                    tags.add(tagText);
                 }
             }
         }
