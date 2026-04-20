@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import MarkdownIt from 'markdown-it'
@@ -11,36 +11,40 @@ const route = useRoute()
 const router = useRouter()
 const store = usePublicArticleStore()
 
-let headingCounter = 0
+const headingCounter = ref(0)
+const md = shallowRef(null)
+const articleContainerRef = ref(null)
 
-const md = new MarkdownIt({
-  html: false,
-  linkify: true,
-  typographer: true,
-  headingId: (content) => {
-    return `heading-${headingCounter++}`
-  },
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
+function createMarkdownIt() {
+  return new MarkdownIt({
+    html: false,
+    linkify: true,
+    typographer: true,
+    headingId: () => {
+      return `heading-${headingCounter.value++}`
+    },
+    highlight: function (str, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return '<pre class="hljs"><code>' +
+            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+            '</code></pre>'
+        } catch (__) {}
+      }
       try {
-        return '<pre class="hljs"><code>' +
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-          '</code></pre>'
+        const result = hljs.highlightAuto(str)
+        return '<pre class="hljs"><code>' + result.value + '</code></pre>'
       } catch (__) {}
+      return '<pre class="hljs"><code>' + md.value.utils.escapeHtml(str) + '</code></pre>'
     }
-    try {
-      const result = hljs.highlightAuto(str)
-      return '<pre class="hljs"><code>' + result.value + '</code></pre>'
-    } catch (__) {}
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
-  }
-})
+  })
+}
 
 const article = computed(() => store.currentArticle)
 const renderedContent = computed(() => {
-  if (!article.value) return ''
-  headingCounter = 0
-  return md.render(article.value.content)
+  if (!article.value || !md.value) return ''
+  headingCounter.value = 0
+  return md.value.render(article.value.content)
 })
 
 function formatDate(dateStr) {
@@ -53,17 +57,27 @@ function goBack() {
   router.back()
 }
 
+function navigateTo(path) {
+  router.push(path)
+}
+
 onMounted(() => {
+  md.value = createMarkdownIt()
   const id = route.params.idSlug.split('-')[0]
   store.fetchArticle(id)
+})
+
+onUnmounted(() => {
+  md.value = null
+  store.currentArticle = null
 })
 </script>
 
 <template>
   <div class="article-page">
-    <ArticleToc v-if="article" :content="renderedContent" />
+    <ArticleToc v-if="article" :content="renderedContent" :article-container="articleContainerRef" />
     
-    <div class="article-container">
+    <div class="article-container" ref="articleContainerRef">
       <button
         @click="goBack()"
         class="back-button"
@@ -93,21 +107,23 @@ onMounted(() => {
           </p>
           
           <div class="article-meta">
-            <router-link
+            <a
               v-if="article.category"
-              :to="`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`"
+              :href="`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`"
               class="meta-tag"
+              @click.prevent="navigateTo(`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`)"
             >
               {{ article.category.name }}
-            </router-link>
-            <router-link
+            </a>
+            <a
               v-for="tag in article.tags"
               :key="tag.id"
-              :to="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
+              :href="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
               class="meta-tag"
+              @click.prevent="navigateTo(`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`)"
             >
               {{ tag.name }}
-            </router-link>
+            </a>
           </div>
         </header>
 
@@ -125,13 +141,15 @@ onMounted(() => {
 
 <style scoped>
 .article-page {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 50px 0 100px;
 }
 
 .article-container {
-  max-width: 700px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .back-button {
