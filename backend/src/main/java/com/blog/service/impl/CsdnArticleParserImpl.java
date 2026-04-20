@@ -75,6 +75,8 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
         // Extract tags - select ALL tag-link-new and tag elements regardless of container
         List<String> tags = new ArrayList<>();
         List<Element> tagElements = doc.select("a.tag-link-new, a.tag");
+        log.debug("Found {} tag elements: {}", tagElements.size(),
+            tagElements.stream().map(e -> e.text()).toList());
         for (Element tag : tagElements) {
             String tagText = tag.text().trim();
             if (!tagText.isEmpty()) {
