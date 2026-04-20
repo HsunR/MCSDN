@@ -73,20 +73,15 @@ _(None yet — start v1.1 with `/gsd-new-milestone`)_
 | Flyway 数据库迁移 | 版本控制的 schema 变更 | ✅ 验证可行 |
 | Dark theme only | 程序员风格，无需 light 切换 | ✅ 验证可行 |
 
-## Current Milestone: v1.1 CSDN 文章同步
+## Current Milestone: v1.2 文章列表快速预览
 
-**Goal:** 让用户把 CSDN 博客文章一键同步到本博客系统，包含图片本地化和标签同步
+**Goal:** 让用户在文章列表页直接预览文章内容，无需跳转到详情页
 
 **Target features:**
-- CSDN 同步工具增强 — 解析 CSDN 文章页提取 tags，复用图片下载逻辑
-- 同步配置 API — 后台配置 CSDN userId + 目标分类 + 定时开关
-- 文章解析导入 — 解析 HTML → Markdown，提取标题/内容/标签，下载图片到本地
-- 手动同步 — 后台点击"同步"按钮立即执行
-- 定时自动同步 — 可开启，每天按配置时间自动拉取新文章
-- 同步去重 + 增量更新 — 根据 CSDN articleId 判断：新增/增量更新/跳过
-- 图片去重 — 根据 URL hash 去重，已存在的图片不重复下载
-- 同步文章标记 — `source: CSDN`, `csdn_article_id: xxx`
-- 编辑警告 — 编辑同步文章时弹窗提醒"该文章为同步文章，不建议编辑"
+- 文章卡片添加"快速预览"按钮
+- 点击后在当前页展开文章内容（Modal 或行内展开）
+- 支持关闭预览回到列表
+- 预览内容包含完整 Markdown 渲染
 
 ## Constraints
 

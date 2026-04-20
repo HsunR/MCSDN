@@ -42,10 +42,10 @@ progress:
 **UI hint**: yes
 
 Plans:
-- [ ] 06-01: Add preview button to article card component
-- [ ] 06-02: Create ArticlePreviewModal component with metadata display
-- [ ] 06-03: Implement full Markdown rendering with code highlighting and images in modal
-- [ ] 06-04: Add close functionality (overlay click, close button) and pagination preservation
+- [x] 06-01: Add preview button to article card component
+- [x] 06-02: Create ArticlePreviewModal component with metadata display
+- [x] 06-03: Implement full Markdown rendering with code highlighting and images in modal
+- [x] 06-04: Add close functionality (overlay click, close button) and pagination preservation
 
 ## Progress
 

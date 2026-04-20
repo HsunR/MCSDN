@@ -174,7 +174,6 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
         if (tagNames == null || tagNames.isEmpty()) {
             return;
         }
-        log.debug("Syncing {} tags for article {}: {}", tagNames.size(), articleId, tagNames);
         // Delete existing tag associations
         articleMapper.deleteArticleTags(articleId);
         // Create or find tags and associate

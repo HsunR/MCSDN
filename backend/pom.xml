@@ -104,6 +104,13 @@
     <version>1.18.1</version>
 </dependency>
 
+        <!-- Apache HttpClient for CSDN requests with cookie management -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+
         <!-- Lombok (optional but useful) -->
         <dependency>
             <groupId>org.projectlombok</groupId>

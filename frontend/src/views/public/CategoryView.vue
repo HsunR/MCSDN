@@ -25,32 +25,117 @@ function goBack() {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="page-container">
     <button
       @click="goBack"
-      class="mb-6 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 flex items-center gap-2"
+      class="back-button"
     >
-      <span>←</span> Back to Home
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+      <span>Back</span>
     </button>
 
-    <h1 class="text-3xl font-bold text-gray-100 mb-8">
-      Category: {{ categorySlug }}
-    </h1>
-
-    <div v-if="store.loading" class="text-center py-12">
-      <p class="text-gray-500">Loading...</p>
+    <div class="page-header">
+      <h1 class="page-title text-lightest-slate">
+        <span class="section-number">01.</span>
+        <span>Category: {{ categorySlug }}</span>
+      </h1>
+      <div class="section-line"></div>
     </div>
-    <div v-else-if="store.articles.length === 0">
-      <p class="text-gray-500">No articles found in this category.</p>
+
+    <div v-if="store.loading" class="loading-state">
+      <p class="text-green font-mono">Loading articles...</p>
+    </div>
+    <div v-else-if="store.articles.length === 0" class="empty-state">
+      <p class="text-slate">No articles found in this category.</p>
     </div>
     <div v-else>
       <ArticleTimeline :articles="store.articles" />
-      <Pagination
-        v-if="store.totalPages > 1"
-        :current-page="store.currentPage"
-        :total-pages="store.totalPages"
-        @page-change="(p) => $router.push({ params: { name: categorySlug }, query: { page: p } })"
-      />
+      <div class="pagination-wrapper">
+        <Pagination
+          v-if="store.totalPages > 1"
+          :current-page="store.currentPage"
+          :total-pages="store.totalPages"
+          @page-change="(p) => $router.push({ params: { name: categorySlug }, query: { page: p } })"
+        />
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.page-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 50px 50px 100px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: var(--fz-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 40px;
+}
+
+.back-button:hover {
+  opacity: 0.8;
+}
+
+.page-header {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.page-title {
+  font-size: var(--fz-heading);
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.section-number {
+  font-family: var(--font-mono);
+  font-size: var(--fz-md);
+  color: var(--green);
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--lightest-navy);
+  max-width: 300px;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.pagination-wrapper {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 30px 25px 60px;
+  }
+}
+</style>

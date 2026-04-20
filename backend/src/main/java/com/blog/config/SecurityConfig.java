@@ -64,13 +64,21 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
             .authorizeHttpRequests(auth -> auth
+                // 公开接口 - 白名单
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/logout").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles/category/{categorySlug}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles/tag/{tagSlug}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/articles/{id}/comments").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/articles/{id}/comments").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/categories").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/tags").permitAll()
-                .requestMatchers("/api/admin/**").authenticated()
-                .anyRequest().permitAll()
+                // 其他所有请求 - 默认需要认证
+                .anyRequest().authenticated()
             )
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

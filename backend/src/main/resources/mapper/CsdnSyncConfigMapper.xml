@@ -29,6 +29,6 @@
     </update>
 
     <update id="updateLastSyncAt">
-        UPDATE csdn_sync_config SET last_sync_at = #{lastSyncAt} WHERE id = (SELECT id FROM csdn_sync_config ORDER BY id DESC LIMIT 1)
+        UPDATE csdn_sync_config SET last_sync_at = #{lastSyncAt} ORDER BY id DESC LIMIT 1
     </update>
 </mapper>
