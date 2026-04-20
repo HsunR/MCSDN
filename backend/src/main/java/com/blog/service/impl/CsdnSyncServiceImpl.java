@@ -32,6 +32,8 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
     private static final String SOURCE_CSDN = "CSDN";
     private static final String STATUS_PUBLISHED = "PUBLISHED";
 
+    private final Object syncLock = new Object();
+
     @Autowired
     private CsdnSyncConfigService csdnSyncConfigService;
 
@@ -53,6 +55,12 @@ public class CsdnSyncServiceImpl implements CsdnSyncService {
     @Override
     @Transactional
     public SyncResultResponse syncArticles() {
+        synchronized (syncLock) {
+            return doSync();
+        }
+    }
+
+    private SyncResultResponse doSync() {
         CsdnSyncConfig config = csdnSyncConfigService.getConfig();
 
         if (config == null || config.getCsdnUserId() == null || config.getCsdnUserId().isEmpty()) {
