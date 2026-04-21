@@ -1,8 +1,9 @@
 <script setup>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, computed, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import ArticleTimeline from '../../components/public/ArticleTimeline.vue'
+import ArticlePreviewModal from '../../components/public/ArticlePreviewModal.vue'
 import Pagination from '../../components/public/Pagination.vue'
 
 const route = useRoute()
@@ -10,6 +11,15 @@ const router = useRouter()
 const store = usePublicArticleStore()
 
 const keyword = computed(() => route.query.q || '')
+const previewArticleId = ref(null)
+
+function handlePreview(articleId) {
+  previewArticleId.value = articleId
+}
+
+function handleClosePreview() {
+  previewArticleId.value = null
+}
 
 onMounted(() => {
   if (keyword.value) {
@@ -51,7 +61,7 @@ function goBack() {
       <p class="text-gray-500">No articles found matching your search.</p>
     </div>
     <div v-else>
-      <ArticleTimeline :articles="store.articles" />
+      <ArticleTimeline :articles="store.articles" @preview="handlePreview" />
       <Pagination
         v-if="store.totalPages > 1"
         :current-page="store.currentPage"
@@ -60,4 +70,10 @@ function goBack() {
       />
     </div>
   </div>
+
+  <ArticlePreviewModal
+    :visible="previewArticleId !== null"
+    :articleId="previewArticleId"
+    @close="handleClosePreview"
+  />
 </template>

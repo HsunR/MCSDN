@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, computed, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import ArticleTimeline from '../../components/public/ArticleTimeline.vue'
@@ -11,12 +11,38 @@ const store = usePublicArticleStore()
 
 const categorySlug = computed(() => route.params.name)
 
+function scrollToContent() {
+  nextTick(() => {
+    setTimeout(() => {
+      const pageContainer = document.querySelector('.page-container')
+      if (pageContainer) {
+        pageContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  })
+}
+
 onMounted(() => {
-  store.fetchByCategory(categorySlug.value)
+  store.fetchByCategory(categorySlug.value).then(() => {
+    scrollToContent()
+  })
 })
 
-watch(() => route.params.name, (newSlug) => {
-  store.fetchByCategory(newSlug)
+watch(() => route.params.name, (newSlug, oldSlug) => {
+  if (newSlug && newSlug !== oldSlug) {
+    store.loading = true
+    store.fetchByCategory(newSlug).then(() => {
+      scrollToContent()
+    })
+  }
+})
+
+watch(() => route.query.page, (newPage) => {
+  if (newPage) {
+    store.fetchByCategory(categorySlug.value, parseInt(newPage)).then(() => {
+      scrollToContent()
+    })
+  }
 })
 
 function goBack() {

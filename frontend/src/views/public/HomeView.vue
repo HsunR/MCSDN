@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import ArticleTimeline from '../../components/public/ArticleTimeline.vue'
@@ -21,12 +21,33 @@ function handleClosePreview() {
   previewArticleId.value = null
 }
 
+function scrollToPosts() {
+  nextTick(() => {
+    setTimeout(() => {
+      const postsSection = document.getElementById('posts')
+      if (postsSection) {
+        postsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  })
+}
+
+function handlePageChange(page) {
+  store.fetchArticles(page).then(() => {
+    scrollToPosts()
+  })
+}
+
 onMounted(() => {
   store.fetchArticles(route.query.page ? parseInt(route.query.page) : 1)
 })
 
 watch(() => route.query.page, (newPage) => {
-  store.fetchArticles(newPage ? parseInt(newPage) : 1)
+  if (newPage) {
+    store.fetchArticles(parseInt(newPage)).then(() => {
+      scrollToPosts()
+    })
+  }
 })
 </script>
 
@@ -75,7 +96,7 @@ watch(() => route.query.page, (newPage) => {
             <Pagination
               :current-page="store.currentPage"
               :total-pages="store.totalPages"
-              @page-change="(p) => $router.push({ query: { page: p } })"
+              @page-change="handlePageChange"
             />
           </div>
         </div>

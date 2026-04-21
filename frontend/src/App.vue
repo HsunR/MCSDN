@@ -8,13 +8,16 @@ import EmailSidebar from './components/public/EmailSidebar.vue'
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isArticleRoute = computed(() => route.path.startsWith('/article/'))
+const isCategoryOrTagRoute = computed(() => 
+  route.path.startsWith('/category/') || route.path.startsWith('/tag/')
+)
 </script>
 
 <template>
   <div class="app-container" :class="{ 'article-layout': isArticleRoute }">
     <template v-if="!isAdminRoute">
-      <Sidebar v-if="!isArticleRoute" />
-      <EmailSidebar v-if="!isArticleRoute" />
+      <Sidebar v-if="!isArticleRoute && !isCategoryOrTagRoute" />
+      <EmailSidebar v-if="!isArticleRoute && !isCategoryOrTagRoute" />
       <main class="main-content">
         <RouterView />
       </main>

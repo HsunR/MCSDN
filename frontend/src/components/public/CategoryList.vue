@@ -1,13 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
+const router = useRouter()
 const categories = ref([])
 const loading = ref(true)
 
 const http = axios.create({
   baseURL: '/api'
 })
+
+function navigateToCategory(slug) {
+  router.push(`/category/${slug}`)
+}
 
 onMounted(async () => {
   try {
@@ -38,11 +44,12 @@ onMounted(async () => {
     </div>
     
     <div v-else class="category-grid">
-      <router-link
+      <a
         v-for="cat in categories"
         :key="cat.id"
-        :to="`/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`"
+        :href="`/category/${cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}`"
         class="category-card"
+        @click.prevent="navigateToCategory(cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-'))"
       >
         <div class="card-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -53,7 +60,7 @@ onMounted(async () => {
           <h4 class="card-title text-lightest-slate">{{ cat.name }}</h4>
           <p class="card-slug text-slate font-mono text-xs">{{ cat.slug || 'category' }}</p>
         </div>
-      </router-link>
+      </a>
     </div>
   </div>
 </template>

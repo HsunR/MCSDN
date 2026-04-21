@@ -20,10 +20,10 @@
             </button>
           </li>
           <li class="nav-item">
-            <a href="/admin" class="nav-link resume-link" target="_blank">
+            <button @click="navigateToAdmin" class="nav-link resume-link">
               <span class="nav-number"></span>
               <span class="resume-button">管理后台</span>
-            </a>
+            </button>
           </li>
         </ol>
       </nav>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -66,10 +66,39 @@ function handleNavClick(item) {
   }
 }
 
+function navigateToAdmin() {
+  router.push('/admin')
+}
+
+function handleScroll() {
+  if (route.path !== '/') return
+  
+  const sections = navItems.map(item => document.getElementById(item.sectionId)).filter(Boolean)
+  const scrollPosition = window.scrollY + 300
+  
+  for (let i = sections.length - 1; i >= 0; i--) {
+    const section = sections[i]
+    if (section && section.offsetTop <= scrollPosition) {
+      currentActive.value = navItems[i].name
+      break
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  handleScroll()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
 watch(() => route.path, (newPath) => {
   if (newPath === '/') {
     currentActive.value = 'About'
-  } else if (newPath.startsWith('/category')) {
+    setTimeout(() => handleScroll(), 300)
+  } else if (newPath.startsWith('/category') || newPath.startsWith('/tag')) {
     currentActive.value = '分类标签'
   }
 })

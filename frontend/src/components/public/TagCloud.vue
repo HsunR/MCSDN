@@ -1,13 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
+const router = useRouter()
 const tags = ref([])
 const loading = ref(true)
 
 const http = axios.create({
   baseURL: '/api'
 })
+
+function navigateToTag(slug) {
+  router.push(`/tag/${slug}`)
+}
 
 onMounted(async () => {
   try {
@@ -38,14 +44,15 @@ onMounted(async () => {
     </div>
     
     <div v-else class="tag-cloud">
-      <router-link
+      <a
         v-for="tag in tags"
         :key="tag.id"
-        :to="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
+        :href="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
         class="tag-item"
+        @click.prevent="navigateToTag(tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-'))"
       >
         {{ tag.name }}
-      </router-link>
+      </a>
     </div>
   </div>
 </template>

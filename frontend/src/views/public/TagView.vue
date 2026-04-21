@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, computed, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import ArticleTimeline from '../../components/public/ArticleTimeline.vue'
@@ -11,12 +11,38 @@ const store = usePublicArticleStore()
 
 const tagSlug = computed(() => route.params.name)
 
+function scrollToContent() {
+  nextTick(() => {
+    setTimeout(() => {
+      const pageContainer = document.querySelector('.page-container')
+      if (pageContainer) {
+        pageContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  })
+}
+
 onMounted(() => {
-  store.fetchByTag(tagSlug.value)
+  store.fetchByTag(tagSlug.value).then(() => {
+    scrollToContent()
+  })
 })
 
-watch(() => route.params.name, (newSlug) => {
-  store.fetchByTag(newSlug)
+watch(() => route.params.name, (newSlug, oldSlug) => {
+  if (newSlug && newSlug !== oldSlug) {
+    store.loading = true
+    store.fetchByTag(newSlug).then(() => {
+      scrollToContent()
+    })
+  }
+})
+
+watch(() => route.query.page, (newPage) => {
+  if (newPage) {
+    store.fetchByTag(tagSlug.value, parseInt(newPage)).then(() => {
+      scrollToContent()
+    })
+  }
 })
 
 function goBack() {

@@ -1,5 +1,6 @@
 <script setup>
-import { computed, watch, onMounted, onUnmounted, ref } from 'vue'
+import { computed, watch, onMounted, onUnmounted, ref, shallowRef } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { usePublicArticleStore } from '../../stores/publicArticleStore'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
@@ -10,33 +11,46 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 
+const router = useRouter()
+const route = useRoute()
 const store = usePublicArticleStore()
 const scrollPosition = ref(0)
 
-const md = new MarkdownIt({
-  html: false,
-  linkify: true,
-  typographer: true,
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
+const md = shallowRef(null)
+
+function createMarkdownIt() {
+  return new MarkdownIt({
+    html: false,
+    linkify: true,
+    typographer: true,
+    highlight: function (str, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return '<pre class="hljs"><code>' +
+            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+            '</code></pre>'
+        } catch (__) {}
+      }
       try {
-        return '<pre class="hljs"><code>' +
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-          '</code></pre>'
+        const result = hljs.highlightAuto(str)
+        return '<pre class="hljs"><code>' + result.value + '</code></pre>'
       } catch (__) {}
+      return '<pre class="hljs"><code>' + md.value.utils.escapeHtml(str) + '</code></pre>'
     }
-    try {
-      const result = hljs.highlightAuto(str)
-      return '<pre class="hljs"><code>' + result.value + '</code></pre>'
-    } catch (__) {}
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
-  }
-})
+  })
+}
+
+function navigateTo(path) {
+  handleClose()
+  setTimeout(() => {
+    router.push(path)
+  }, 150)
+}
 
 const article = computed(() => store.currentArticle)
 const renderedContent = computed(() => {
-  if (!article.value) return ''
-  return md.render(article.value.content)
+  if (!article.value || !md.value) return ''
+  return md.value.render(article.value.content)
 })
 
 function formatDate(dateStr) {
@@ -76,8 +90,16 @@ watch(() => props.articleId, (newId) => {
   }
 }, { immediate: true })
 
-onMounted(() => document.addEventListener('keydown', handleEscape))
-onUnmounted(() => document.removeEventListener('keydown', handleEscape))
+onMounted(() => {
+  md.value = createMarkdownIt()
+  document.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscape)
+  md.value = null
+  store.currentArticle = null
+})
 </script>
 
 <template>
@@ -95,21 +117,23 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape))
           <h2 class="modal-title">{{ article?.title }}</h2>
           <p class="modal-date">{{ formatDate(article?.createdAt) }}</p>
           <div class="modal-meta">
-            <router-link
+            <a
               v-if="article?.category"
-              :to="`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`"
+              :href="`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`"
               class="meta-tag"
+              @click.prevent="navigateTo(`/category/${article.category.slug || article.category.name.toLowerCase().replace(/\s+/g, '-')}`)"
             >
               {{ article.category.name }}
-            </router-link>
-            <router-link
+            </a>
+            <a
               v-for="tag in article?.tags"
               :key="tag.id"
-              :to="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
+              :href="`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`"
               class="meta-tag"
+              @click.prevent="navigateTo(`/tag/${tag.slug || tag.name.toLowerCase().replace(/\s+/g, '-')}`)"
             >
               {{ tag.name }}
-            </router-link>
+            </a>
           </div>
         </div>
         <button
