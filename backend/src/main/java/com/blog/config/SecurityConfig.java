@@ -77,6 +77,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/articles/{id}/comments").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/categories").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/tags").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/admin/portfolios/public").permitAll()
                 // 其他所有请求 - 默认需要认证
                 .anyRequest().authenticated()
             )

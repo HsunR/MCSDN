@@ -1,12 +1,15 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useAuthStore } from '../../stores/authStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['close', 'insert'])
+
+const authStore = useAuthStore()
 
 const fileInput = ref(null)
 const uploading = ref(false)
@@ -50,11 +53,10 @@ async function uploadFile(file) {
     const formData = new FormData()
     formData.append('file', file)
 
-    const token = localStorage.getItem('admin_token')
     const response = await axios.post('/api/admin/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${authStore.token}`
       }
     })
 

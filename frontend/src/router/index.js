@@ -51,6 +51,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/admin/portfolios',
+    name: 'PortfolioManagement',
+    component: () => import('../views/admin/PortfolioManagementView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/admin/csdn-sync',
     name: 'CsdnSync',
     component: () => import('../views/admin/CsdnSyncView.vue'),

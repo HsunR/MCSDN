@@ -24,9 +24,23 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> getAllArticles() {
         List<Article> articles = articleMapper.findAll();
-        for (Article article : articles) {
-            article.setTags(articleMapper.findTagsByArticleId(article.getId()));
+        if (articles.isEmpty()) {
+            return articles;
         }
+        
+        List<Long> articleIds = articles.stream()
+            .map(Article::getId)
+            .collect(java.util.stream.Collectors.toList());
+        
+        List<Tag> allTags = articleMapper.findTagsByArticleIds(articleIds);
+        
+        java.util.Map<Long, List<Tag>> tagsByArticleId = allTags.stream()
+            .collect(java.util.stream.Collectors.groupingBy(Tag::getArticleId));
+        
+        for (Article article : articles) {
+            article.setTags(tagsByArticleId.getOrDefault(article.getId(), java.util.Collections.emptyList()));
+        }
+        
         return articles;
     }
 

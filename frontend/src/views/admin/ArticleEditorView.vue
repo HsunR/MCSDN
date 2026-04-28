@@ -4,7 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useArticleStore } from '../../stores/articleStore'
 import AdminSidebar from '../../components/admin/AdminSidebar.vue'
 import MarkdownEditor from '../../components/admin/MarkdownEditor.vue'
-import axios from 'axios'
+import { adminHttp } from '../../utils/http'
 
 const router = useRouter()
 const route = useRoute()
@@ -23,13 +23,9 @@ const tagInput = ref('')
 const saving = ref(false)
 const showSyncWarning = ref(false)
 
-const http = axios.create({
-  baseURL: '/api'
-})
-
 async function fetchCategories() {
   try {
-    const res = await http.get('/admin/categories')
+    const res = await adminHttp.get('/admin/categories')
     categories.value = res.data
   } catch (err) {
     console.error('Failed to fetch categories:', err)

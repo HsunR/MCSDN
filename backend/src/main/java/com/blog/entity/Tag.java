@@ -6,6 +6,7 @@ public class Tag {
     private Long id;
     private String name;
     private LocalDateTime createdAt;
+    private Long articleId;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -13,4 +14,6 @@ public class Tag {
     public void setName(String name) { this.name = name; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Long getArticleId() { return articleId; }
+    public void setArticleId(Long articleId) { this.articleId = articleId; }
 }

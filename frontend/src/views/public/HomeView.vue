@@ -8,10 +8,12 @@ import Pagination from '../../components/public/Pagination.vue'
 import SearchBar from '../../components/public/SearchBar.vue'
 import CategoryList from '../../components/public/CategoryList.vue'
 import TagCloud from '../../components/public/TagCloud.vue'
+import PortfolioGallery from '../../components/public/PortfolioGallery.vue'
 
 const store = usePublicArticleStore()
 const route = useRoute()
 const previewArticleId = ref(null)
+const postsSection = ref(null)
 
 function handlePreview(articleId) {
   previewArticleId.value = articleId
@@ -24,9 +26,8 @@ function handleClosePreview() {
 function scrollToPosts() {
   nextTick(() => {
     setTimeout(() => {
-      const postsSection = document.getElementById('posts')
-      if (postsSection) {
-        postsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      if (postsSection.value) {
+        postsSection.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
     }, 100)
   })
@@ -68,7 +69,7 @@ watch(() => route.query.page, (newPage) => {
       </div>
     </section>
 
-    <section class="featured-section" id="posts">
+    <section ref="postsSection" class="featured-section" id="posts">
       <div class="section-header">
         <h2 class="section-title">
           <span class="section-number">01.</span>
@@ -103,10 +104,24 @@ watch(() => route.query.page, (newPage) => {
       </div>
     </section>
 
-    <section class="featured-section" id="categories">
+    <section class="featured-section" id="portfolios">
       <div class="section-header">
         <h2 class="section-title">
           <span class="section-number">02.</span>
+          <span class="section-text text-lightest-slate">Portfolio</span>
+        </h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="section-content">
+        <PortfolioGallery />
+      </div>
+    </section>
+
+    <section class="featured-section" id="categories">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-number">03.</span>
           <span class="section-text text-lightest-slate">Categories & Tags</span>
         </h2>
         <div class="section-line"></div>

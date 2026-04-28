@@ -4,6 +4,7 @@ import com.blog.dto.CommentRequest;
 import com.blog.entity.Comment;
 import com.blog.mapper.CommentMapper;
 import com.blog.service.CommentService;
+import com.blog.util.XssFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,8 @@ public class CommentServiceImpl implements CommentService {
         }
         Comment comment = new Comment();
         comment.setArticleId(articleId);
-        comment.setAuthorName(request.getAuthorName());
-        comment.setContent(request.getContent());
+        comment.setAuthorName(XssFilter.sanitize(request.getAuthorName()));
+        comment.setContent(XssFilter.sanitize(request.getContent()));
         comment.setStatus("PENDING");
         commentMapper.insert(comment);
     }

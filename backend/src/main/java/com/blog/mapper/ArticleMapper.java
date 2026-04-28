@@ -15,6 +15,7 @@ public interface ArticleMapper {
     int update(Article article);
     int delete(@Param("id") Long id);
     List<Tag> findTagsByArticleId(@Param("articleId") Long articleId);
+    List<Tag> findTagsByArticleIds(@Param("articleIds") List<Long> articleIds);
     int insertArticleTag(@Param("articleId") Long articleId, @Param("tagId") Long tagId);
     int deleteArticleTags(@Param("articleId") Long articleId);
     List<Article> findPublishedPaginated(@Param("limit") int limit, @Param("offset") int offset);

@@ -4,6 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -15,8 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
     private static final int MAX_ATTEMPTS = 5;
     private static final long WINDOW_MS = 60000;
+    private static final long CLEANUP_INTERVAL_MS = 300000;
 
     private final Map<String, RateLimitEntry> ipAttempts = new ConcurrentHashMap<>();
 
@@ -54,6 +59,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         return true;
+    }
+
+    @Scheduled(fixedRate = CLEANUP_INTERVAL_MS)
+    public void cleanupExpiredEntries() {
+        long now = System.currentTimeMillis();
+        ipAttempts.entrySet().removeIf(entry -> 
+            now - entry.getValue().windowStart > WINDOW_MS * 2
+        );
     }
 
     private String getClientIp(HttpServletRequest request) {

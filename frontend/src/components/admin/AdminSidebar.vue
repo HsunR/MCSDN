@@ -27,6 +27,15 @@ function handleLogout() {
       <h1 class="text-xl font-bold text-gray-100">Blog Admin</h1>
     </div>
 
+    <div class="px-4">
+      <a
+        href="/"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-gray-100 border border-gray-700"
+      >
+        View Site
+      </a>
+    </div>
+
     <nav class="flex-1 px-4">
       <router-link
         to="/admin"
@@ -72,6 +81,14 @@ function handleLogout() {
         :class="route.path.startsWith('/admin/tags') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
       >
         Tags
+      </router-link>
+
+      <router-link
+        to="/admin/portfolios"
+        class="block px-4 py-2 mb-1 rounded-lg transition-colors"
+        :class="route.path.startsWith('/admin/portfolios') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100'"
+      >
+        Portfolios
       </router-link>
 
       <router-link

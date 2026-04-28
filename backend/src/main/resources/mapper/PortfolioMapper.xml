@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.PortfolioMapper">
+
+    <resultMap id="portfolioResultMap" type="com.blog.entity.Portfolio">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="coverImage" column="cover_image"/>
+        <result property="articleId" column="article_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <association property="article" javaType="com.blog.entity.Article">
+            <id property="id" column="article_id"/>
+            <result property="title" column="article_title"/>
+        </association>
+    </resultMap>
+
+    <select id="findAllOrderBySortOrder" resultMap="portfolioResultMap">
+        SELECT p.id, p.title, p.cover_image, p.article_id, p.sort_order, p.created_at, p.updated_at,
+               a.title AS article_title
+        FROM portfolio p
+        LEFT JOIN articles a ON p.article_id = a.id
+        ORDER BY p.sort_order ASC, p.created_at DESC
+    </select>
+
+    <select id="findById" resultMap="portfolioResultMap">
+        SELECT p.id, p.title, p.cover_image, p.article_id, p.sort_order, p.created_at, p.updated_at,
+               a.title AS article_title
+        FROM portfolio p
+        LEFT JOIN articles a ON p.article_id = a.id
+        WHERE p.id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO portfolio (title, cover_image, article_id, sort_order)
+        VALUES (#{title}, #{coverImage}, #{articleId}, #{sortOrder})
+    </insert>
+
+    <update id="update">
+        UPDATE portfolio
+        SET title = #{title},
+            cover_image = #{coverImage},
+            article_id = #{articleId},
+            sort_order = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM portfolio WHERE id = #{id}
+    </delete>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM portfolio
+    </select>
+
+    <select id="findAllPublished" resultMap="portfolioResultMap">
+        SELECT p.id, p.title, p.cover_image, p.article_id, p.sort_order, p.created_at, p.updated_at,
+               a.title AS article_title
+        FROM portfolio p
+        LEFT JOIN articles a ON p.article_id = a.id
+        WHERE a.status = 'PUBLISHED'
+        ORDER BY p.sort_order ASC, p.created_at DESC
+    </select>
+
+</mapper>

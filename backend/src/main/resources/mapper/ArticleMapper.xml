@@ -53,6 +53,16 @@
         WHERE at.article_id = #{articleId}
     </select>
 
+    <select id="findTagsByArticleIds" resultType="com.blog.entity.Tag">
+        SELECT t.id, t.name, t.created_at, at.article_id
+        FROM tags t
+        INNER JOIN article_tags at ON t.id = at.tag_id
+        WHERE at.article_id IN
+        <foreach item="articleId" collection="articleIds" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+    </select>
+
     <insert id="insertArticleTag">
         INSERT INTO article_tags (article_id, tag_id)
         VALUES (#{articleId}, #{tagId})
