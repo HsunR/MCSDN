@@ -7,6 +7,7 @@ import com.blog.entity.Article;
 import com.blog.entity.Tag;
 import com.blog.mapper.ArticleMapper;
 import com.blog.service.PublicArticleService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class PublicArticleServiceImpl implements PublicArticleService {
     }
 
     @Override
+    @Cacheable(value = "articleList", key = "'list_' + #request.page + '_' + #request.pageSize")
     public ArticleListResponse getArticles(ArticleListRequest request) {
         List<Article> articles = articleMapper.findPublishedPaginated(
             request.getLimit(), request.getOffset());
@@ -29,6 +31,7 @@ public class PublicArticleServiceImpl implements PublicArticleService {
     }
 
     @Override
+    @Cacheable(value = "article", key = "#id")
     public PublicArticleResponse getArticleById(Long id) {
         Article article = articleMapper.findById(id);
         if (article == null || !"PUBLISHED".equals(article.getStatus())) {
@@ -39,6 +42,7 @@ public class PublicArticleServiceImpl implements PublicArticleService {
     }
 
     @Override
+    @Cacheable(value = "articlesByCategory", key = "#categorySlug + '_' + #page + '_' + #pageSize")
     public ArticleListResponse getArticlesByCategory(String categorySlug, int page, int pageSize) {
         ArticleListRequest request = new ArticleListRequest(page, pageSize);
         request.setCategorySlug(categorySlug);
@@ -49,6 +53,7 @@ public class PublicArticleServiceImpl implements PublicArticleService {
     }
 
     @Override
+    @Cacheable(value = "articlesByTag", key = "#tagSlug + '_' + #page + '_' + #pageSize")
     public ArticleListResponse getArticlesByTag(String tagSlug, int page, int pageSize) {
         ArticleListRequest request = new ArticleListRequest(page, pageSize);
         request.setTagSlug(tagSlug);
@@ -59,6 +64,7 @@ public class PublicArticleServiceImpl implements PublicArticleService {
     }
 
     @Override
+    @Cacheable(value = "articleSearch", key = "#keyword + '_' + #page + '_' + #pageSize")
     public ArticleListResponse searchArticles(String keyword, int page, int pageSize) {
         ArticleListRequest request = new ArticleListRequest(page, pageSize);
         request.setKeyword(keyword);

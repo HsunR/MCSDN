@@ -6,7 +6,9 @@ import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.TagMapper;
 import com.blog.service.ArticleService;
 import com.blog.dto.ArticleRequest;
+import com.blog.util.RedisCacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private TagMapper tagMapper;
+
+    @Autowired
+    private RedisCacheUtil redisCacheUtil;
 
     @Override
     public List<Article> getAllArticles() {
@@ -55,6 +60,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"articleList", "articlesByCategory", "articlesByTag", "articleSearch"}, allEntries = true)
     public Article createArticle(ArticleRequest request) {
         Article article = new Article();
         article.setTitle(request.getTitle());
@@ -79,6 +85,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"article", "articleList", "articlesByCategory", "articlesByTag", "articleSearch"}, allEntries = true)
     public Article updateArticle(Long id, ArticleRequest request) {
         Article article = articleMapper.findById(id);
         if (article == null) {
@@ -103,13 +110,18 @@ public class ArticleServiceImpl implements ArticleService {
                 articleMapper.insertArticleTag(id, tag.getId());
             }
         }
+
+        redisCacheUtil.deleteArticleCache(id);
+
         return getArticleById(id);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = {"article", "articleList", "articlesByCategory", "articlesByTag", "articleSearch"}, allEntries = true)
     public void deleteArticle(Long id) {
         articleMapper.deleteArticleTags(id);
         articleMapper.delete(id);
+        redisCacheUtil.deleteArticleCache(id);
     }
 }

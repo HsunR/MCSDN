@@ -30,12 +30,17 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
     private static final String TITLE_FALLBACK = "h1";
     private static final String CONTENT_SELECTOR = "div#content_views, div#article_content, div.article_content";
     private static final String CONTENT_FALLBACK = "div.htmledit_views";
-    private static final String TAG_SELECTOR = "div.tags-box a.tag-link-new, div.tag-list-box a.tag";
-    private static final String TAG_FALLBACK = "div.tags-box a, div.tags a";
+    // Tag selectors - used in parseArticle method
+    private static final String TAG_SELECTOR = "a.tag-link-new, a.tag";
     private static final String PUBLISHED_DATE_SELECTOR = "span.time";
     private static final DateTimeFormatter CSDN_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Pattern CSDN_DATE_TEXT_PATTERN = Pattern.compile(
             "(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})");
+
+    // Pre-compiled patterns for article ID extraction (performance optimization)
+    private static final Pattern ARTICLE_ID_PATTERN_DETAILS = Pattern.compile("/article/details/(\\d+)");
+    private static final Pattern ARTICLE_ID_PATTERN_HTML = Pattern.compile("/article/(\\d{8,})\\.html$");
+    private static final Pattern ARTICLE_ID_PATTERN_SHORT = Pattern.compile("/p/(\\d+)");
 
     @Autowired
     private HtmlToMarkdownConverter htmlToMarkdownConverter;
@@ -72,19 +77,13 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
             log.warn("Could not find content element for article: {}", url);
         }
 
-        // Extract tags - select ALL tag-link-new and tag elements regardless of container
+        // Extract tags using the defined selector constant
         List<String> tags = new ArrayList<>();
-        List<Element> tagElements = doc.select("a.tag-link-new, a.tag");
-        for (Element tag : tagElements) {
+        for (Element tag : doc.select(TAG_SELECTOR)) {
             String tagText = tag.text().trim();
+            // Remove leading # if present and add non-empty tags
             if (!tagText.isEmpty()) {
-                // Remove leading # if present
-                if (tagText.startsWith("#")) {
-                    tagText = tagText.substring(1);
-                }
-                if (!tagText.isEmpty()) {
-                    tags.add(tagText);
-                }
+                tags.add(tagText.startsWith("#") ? tagText.substring(1) : tagText);
             }
         }
         dto.setTags(tags);
@@ -128,22 +127,19 @@ public class CsdnArticleParserImpl implements CsdnArticleParser {
         // 3. https://blog.csdn.net/user/p/12345678                (older format)
 
         // Pattern 1: /article/details/{number} - most common current format
-        Pattern p1 = Pattern.compile("/article/details/(\\d+)");
-        Matcher m1 = p1.matcher(url);
+        Matcher m1 = ARTICLE_ID_PATTERN_DETAILS.matcher(url);
         if (m1.find()) {
             return m1.group(1);
         }
 
         // Pattern 2: /article/{number}.html - legacy format
-        Pattern p2 = Pattern.compile("/article/(\\d{8,})\\.html$");
-        Matcher m2 = p2.matcher(url);
+        Matcher m2 = ARTICLE_ID_PATTERN_HTML.matcher(url);
         if (m2.find()) {
             return m2.group(1);
         }
 
         // Pattern 3: /p/{number} - older short URL format
-        Pattern p3 = Pattern.compile("/p/(\\d+)");
-        Matcher m3 = p3.matcher(url);
+        Matcher m3 = ARTICLE_ID_PATTERN_SHORT.matcher(url);
         if (m3.find()) {
             return m3.group(1);
         }
