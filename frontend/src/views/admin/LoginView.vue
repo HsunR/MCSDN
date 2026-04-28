@@ -32,24 +32,24 @@ async function handleLogin() {
 
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+          <label class="block text-sm font-medium text-gray-300 mb-2">账号</label>
           <input
             v-model="username"
             type="text"
             required
             class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="admin"
+            placeholder="请输入账号"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+          <label class="block text-sm font-medium text-gray-300 mb-2">密码</label>
           <input
             v-model="password"
             type="password"
             required
             class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="admin123"
+            placeholder="请输入密码"
           />
         </div>
 
