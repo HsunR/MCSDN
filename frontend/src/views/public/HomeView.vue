@@ -64,15 +64,29 @@ watch(() => route.query.page, (newPage) => {
           This is where I share my thoughts, tutorials, and experiences.
         </p>
         <div class="hero-cta">
-          <a href="#posts" class="btn-primary">Check out my posts</a>
+          <a href="#portfolios" class="btn-primary">Check out my portfolio</a>
         </div>
+      </div>
+    </section>
+
+    <section class="featured-section" id="portfolios">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-number">01.</span>
+          <span class="section-text text-lightest-slate">Portfolio</span>
+        </h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="section-content">
+        <PortfolioGallery />
       </div>
     </section>
 
     <section ref="postsSection" class="featured-section" id="posts">
       <div class="section-header">
         <h2 class="section-title">
-          <span class="section-number">01.</span>
+          <span class="section-number">02.</span>
           <span class="section-text text-lightest-slate">Latest Posts</span>
         </h2>
         <div class="section-line"></div>
@@ -101,20 +115,6 @@ watch(() => route.query.page, (newPage) => {
             />
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="featured-section" id="portfolios">
-      <div class="section-header">
-        <h2 class="section-title">
-          <span class="section-number">02.</span>
-          <span class="section-text text-lightest-slate">Portfolio</span>
-        </h2>
-        <div class="section-line"></div>
-      </div>
-
-      <div class="section-content">
-        <PortfolioGallery />
       </div>
     </section>
 

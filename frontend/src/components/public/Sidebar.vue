@@ -41,8 +41,8 @@ const currentActive = ref('About')
 
 const navItems = [
   { name: 'About', number: '01.', sectionId: 'about', page: '/' },
-  { name: '文章', number: '02.', sectionId: 'posts', page: '/' },
-  { name: '作品集', number: '03.', sectionId: 'portfolios', page: '/' },
+  { name: '作品集', number: '02.', sectionId: 'portfolios', page: '/' },
+  { name: '文章', number: '03.', sectionId: 'posts', page: '/' },
   { name: '分类标签', number: '04.', sectionId: 'categories', page: '/' },
 ]
 
